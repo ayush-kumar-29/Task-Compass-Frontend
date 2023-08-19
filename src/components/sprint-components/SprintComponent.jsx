@@ -2,7 +2,7 @@ import React from 'react';
 import { Button, ButtonGroup, CardContent, FormControlLabel, FormGroup, Paper, Radio, RadioGroup, Switch } from '@mui/material';
 import Card from '@mui/material/Card';
 import {Grid} from '@mui/material';
-import TodoItemComponent from './TodoItemComponent';
+import SprintItemComponent from './SprintItemComponent';
 
 const gridPosition = {
     display: 'flex',
@@ -13,7 +13,7 @@ const gridPosition = {
     // height: '80vh'
 }
 
-export default function TodoComponent(){
+export default function SprintComponent(){
     return(
         <div>
             <div style={{position: 'sticky',top: '50px', zIndex: 1}}>
@@ -25,7 +25,7 @@ export default function TodoComponent(){
                             <Button variant="contained"
                                     fullWidth={true}
                             >
-                                Add a new Todo
+                                Create a new Sprint
                             </Button>
                         </Grid>
 
@@ -33,8 +33,8 @@ export default function TodoComponent(){
 
                         <Grid item xs={4}>
                             <FormGroup row>
-                                <FormControlLabel control={<Switch defaultChecked />} label="Open" />
-                                <FormControlLabel control={<Switch />} label="Completed" />
+                                <FormControlLabel control={<Switch defaultChecked />} label="Ongoing" />
+                                <FormControlLabel control={<Switch />} label="Closed" />
                             </FormGroup>
                         </Grid>
 
@@ -48,19 +48,19 @@ export default function TodoComponent(){
                         <div style={gridPosition}>
                             <Grid container spacing={1} justifyContent="center" direction="column">
                                 <Grid item >
-                                    <TodoItemComponent/>
+                                    <SprintItemComponent/>
                                 </Grid>
                                 <Grid item>
-                                    <TodoItemComponent/>
+                                    <SprintItemComponent/>
                                 </Grid>
                                 <Grid item>
-                                    <TodoItemComponent/>
+                                    <SprintItemComponent/>
                                 </Grid>
                                 <Grid item>
-                                    <TodoItemComponent/>
+                                    <SprintItemComponent/>
                                 </Grid>
                                 <Grid item>
-                                    <TodoItemComponent/>
+                                    <SprintItemComponent/>
                                 </Grid>
                             </Grid> 
                         </div>

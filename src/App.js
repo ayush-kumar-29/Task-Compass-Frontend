@@ -1,11 +1,11 @@
 import logo from './logo.svg';
 import './App.css';
-import TaskCompassApp from './components/TaskCompassApp';
+import WorkCompassApp from './components/WorkCompassApp';
 
 function App() {
   return (
     <div className="App">
-      <TaskCompassApp/>
+      <WorkCompassApp/>
     </div>
   );
 }
