@@ -15,10 +15,10 @@ const cardPosition = {
     marginTop:30,
 }
 
-export default function CreateTaskComponent(){
+export default function ViewIssueComponent(){
     const sprints=["Sprint-1", "Sprint-2", "Sprint-3"]
     const assignee=["User-1", "User-2", "User-3"]
-    const status=["New", "Ongoing", "Closed"]
+    const status=["New", "In Progress", "Resolved"]
     const priority=["High", "Medium", "Low"]
     return(
         <div style={cardPosition}>
@@ -33,19 +33,26 @@ export default function CreateTaskComponent(){
                                 direction="row"
                                 justifyContent="center"
                                 alignItems="center"
+                                spacing={2}
                             >
                                 <Grid item xs={4}></Grid>
                                 <Grid item xs={4}>
                                     <Typography variant="h5">
-                                        Create Task
+                                        Issue Id
                                     </Typography> 
                                 </Grid>
-                                <Grid item xs={2}></Grid>
                                 <Grid item xs={2}>
                                     <Button variant="contained"
                                         fullWidth={true}
                                     >
-                                        Discard
+                                        Edit
+                                    </Button>
+                                </Grid>
+                                <Grid item xs={2}>
+                                    <Button variant="contained"
+                                        fullWidth={true}
+                                    >
+                                        Delete
                                     </Button>
                                 </Grid>
                             </Grid>
@@ -55,7 +62,7 @@ export default function CreateTaskComponent(){
                             <Grid container
                                 spacing={3}
                             >
-                                <Grid item xs={7}>
+                                <Grid item xs={7.5}>
                                     <Grid container
                                         spacing={2}>
                                         <Grid item xs={12}>
@@ -78,46 +85,15 @@ export default function CreateTaskComponent(){
                                                 rows={6}
                                             />
                                         </Grid>
-                                    </Grid>
-                                </Grid>
-                                
-                                <Grid item xs={5}>
-                                    <Grid container
-                                        spacing={2.1}
-                                    >
-                                        <Grid item xs={12}>
-                                            <TextField
-                                                id="outlined-select-currency"
-                                                select
-                                                label="Priority"
-                                                size="small"
-                                                fullWidth={true}
-                                                >
-                                                {priority.map((priority) => {return (
-                                                    <MenuItem value={priority}>{priority}</MenuItem>
-                                                )})}
-                                            </TextField>
-                                        </Grid>
 
-                                        <Grid item xs={12}>
-                                            <Autocomplete
-                                                disablePortal
-                                                options={assignee}
-                                                size="small"
-                                                fullWidth={true}
-                                                renderInput={(params) => <TextField {...params} label="Assignee" />}    
-                                            />
-                                        </Grid>
-
-                                        <Grid item xs={12}>
+                                        {/* <Grid item xs={12}>
                                             <Autocomplete
                                                 disablePortal
                                                 options={sprints}
                                                 fullWidth={true}
-                                                // size="small"
                                                 renderInput={(params) => <TextField {...params} label="Sprint" />}    
                                             />
-                                        </Grid>
+                                        </Grid> */}
 
                                         <Grid item xs={12}>
                                             <TextField
@@ -130,6 +106,76 @@ export default function CreateTaskComponent(){
                                         </Grid>
                                     </Grid>
                                 </Grid>
+                                
+                                <Grid item xs={4.5}>
+                                    <Grid container
+                                        spacing={1.5}
+                                    >
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                select
+                                                label="Status"
+                                                fullWidth={true}
+                                                >
+                                                {status.map((status) => {return (
+                                                    <MenuItem value={status}>{status}</MenuItem>
+                                                )})}
+                                            </TextField>
+                                        </Grid>
+
+                                        <Grid item xs={12}>
+                                            <TextField
+                                                select={true}
+                                                label="Priority"
+                                                // disabled={true}
+                                                // defaultValue="High"
+                                                fullWidth={true}
+                                                >
+                                                {priority.map((priority) => {return (
+                                                    <MenuItem value={priority}>{priority}</MenuItem>
+                                                )})}
+                                            </TextField>
+                                        </Grid>
+
+                                        <Grid item xs={12}>
+                                            <Autocomplete
+                                                disablePortal
+                                                options={assignee}
+                                                fullWidth={true}
+                                                renderInput={(params) => <TextField {...params} label="Assignee" />}    
+                                            />
+                                        </Grid>
+
+                                        <Grid item xs={12}>
+                                            <Grid container
+                                                spacing={1.2}
+                                            >
+                                                <Grid item xs={12}></Grid>
+                                                <Grid item xs={12}>
+                                                    <TextField
+                                                        disabled
+                                                        label="Created By"
+                                                        fullWidth={true}
+                                                        size="small"
+                                                        defaultValue="User-2"
+                                                    />
+                                                </Grid>
+
+                                                <Grid item xs={12}></Grid>
+
+                                                <Grid item xs={12}>
+                                                    <TextField
+                                                        disabled
+                                                        label="Created On"
+                                                        fullWidth={true}
+                                                        size="small"
+                                                        defaultValue="22-08-2023"
+                                                    />
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
+                                    </Grid>
+                                </Grid>
                             </Grid>
                         </Grid>
 
@@ -137,7 +183,7 @@ export default function CreateTaskComponent(){
                             <Button variant="contained"
                                     fullWidth={true}
                             >
-                                Create
+                                Save
                             </Button>
                         </Grid>
                     </Grid>

@@ -15,10 +15,9 @@ const cardPosition = {
     marginTop:30,
 }
 
-export default function CreateTaskComponent(){
+export default function CreateIssueComponent(){
     const sprints=["Sprint-1", "Sprint-2", "Sprint-3"]
     const assignee=["User-1", "User-2", "User-3"]
-    const status=["New", "Ongoing", "Closed"]
     const priority=["High", "Medium", "Low"]
     return(
         <div style={cardPosition}>
@@ -37,7 +36,7 @@ export default function CreateTaskComponent(){
                                 <Grid item xs={4}></Grid>
                                 <Grid item xs={4}>
                                     <Typography variant="h5">
-                                        Create Task
+                                        Create Issue
                                     </Typography> 
                                 </Grid>
                                 <Grid item xs={2}></Grid>
@@ -75,7 +74,7 @@ export default function CreateTaskComponent(){
                                                 helperText=""
                                                 multiline
                                                 fullWidth={true}
-                                                rows={6}
+                                                rows={3}
                                             />
                                         </Grid>
                                     </Grid>
@@ -83,13 +82,13 @@ export default function CreateTaskComponent(){
                                 
                                 <Grid item xs={5}>
                                     <Grid container
-                                        spacing={2.1}
+                                        spacing={2.3}
                                     >
                                         <Grid item xs={12}>
                                             <TextField
                                                 id="outlined-select-currency"
                                                 select
-                                                label="Priority"
+                                                label="Severity"
                                                 size="small"
                                                 fullWidth={true}
                                                 >
@@ -106,16 +105,6 @@ export default function CreateTaskComponent(){
                                                 size="small"
                                                 fullWidth={true}
                                                 renderInput={(params) => <TextField {...params} label="Assignee" />}    
-                                            />
-                                        </Grid>
-
-                                        <Grid item xs={12}>
-                                            <Autocomplete
-                                                disablePortal
-                                                options={sprints}
-                                                fullWidth={true}
-                                                // size="small"
-                                                renderInput={(params) => <TextField {...params} label="Sprint" />}    
                                             />
                                         </Grid>
 
