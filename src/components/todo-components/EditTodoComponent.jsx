@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button, CardContent, Grid, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
+import { useParams } from 'react-router-dom';
 // import { makeStyles } from '@mui/styles';
 
 const cardStyle = ()=>({
@@ -16,6 +17,19 @@ const cardPosition = {
 }
 
 export default function EditTodoComponent(){
+    const [todo, setTodo] = useState()
+    const params = useParams()
+
+    useEffect(() => {
+        // TODO: CHANGE USERNAME
+        callRetrieveTodoApi({userName:"user1", open:openFilter, completed:completedFilter})
+        .then((resp) => {
+            // console.log(resp.data)
+            setTodo(resp.data)
+        })
+        .catch((error) => console.log(error))
+    })
+
     return(
         <div style={cardPosition}>
             <Card sx={cardStyle}>

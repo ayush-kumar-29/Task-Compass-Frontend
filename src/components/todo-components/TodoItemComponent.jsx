@@ -2,10 +2,8 @@ import React from 'react';
 import { Button, CardContent, Checkbox, FormControlLabel, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import {Grid} from '@mui/material';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-// import { makeStyles } from '@mui/styles';
+import {useNavigate} from "react-router-dom"
+import { callDeleteTodoApi, callUpdateTodoStatusApi } from '../../api/TodoApiService';
 
 const cardStyle = ()=>({
     width: 1200,
@@ -18,31 +16,29 @@ const cardPosition = {
     marginTop:30,
 }
 
-const desc="Lorem ipsum dolor sit amet, consectetur adipisicing elit. Quos blanditiis tenetur unde suscipit, quam beatae rerum inventore consectetur, neque doloribus"
+export default function TodoItemComponent({todoId, todoDesc, dueDate, status}){
+    const navigate = useNavigate()
 
-export default function TodoItemComponent(){
+    function markTodoAsDone(){
+        callUpdateTodoStatusApi(todoId, {userName: "user1", updateType: "status"})
+    }
+
+    function updateTodo(){
+        navigate(`/todos/editTodo/${todoId}`)
+    }
+
+    function deleteTodo(){
+        // TODO: CHANGE USER NAME
+        callDeleteTodoApi(todoId, {userName: "user1"})
+    }
     return(
-        // <Accordion>
-        //         <AccordionSummary
-        //         aria-controls="panel1a-content"
-        //         id="panel1a-header"
-        //         >
-        //         <Typography>Accordion 1</Typography>
-        //         </AccordionSummary>
-        //         <AccordionDetails>
-        //         <Typography>
-        //             Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-        //             malesuada lacus ex, sit amet blandit leo lobortis eget.
-        //         </Typography>
-        //         </AccordionDetails>
-        // </Accordion>
         <div style={cardPosition}>
             <Card sx={cardStyle}>
                 <React.Fragment>
                     <CardContent>
                         <Grid container spacing={2} alignItems="center">
                             <Grid item xs={8}>
-                                <Typography variant="body1">{desc}</Typography>
+                                <Typography variant="body1">{todoDesc}</Typography>
                             </Grid>
                             <Grid item xs={2}>
                                 <Grid container 
@@ -51,14 +47,15 @@ export default function TodoItemComponent(){
                                     alignItems="center"
                                 >
                                     <Grid item>
-                                        <Typography>Due Date: 2023-08-31</Typography>
+                                        <Typography>{"Due Date: "+dueDate}</Typography>
                                     </Grid>
                                     <Grid item>
                                         <Button
                                             // variant="contained"
                                             fullWidth={true}
+                                            onClick={markTodoAsDone}
                                         >
-                                            Mark as done
+                                            {"Mark as "+ (status?"Open":"Completed")}
                                         </Button>
                                     </Grid>
                                 </Grid>
@@ -67,6 +64,7 @@ export default function TodoItemComponent(){
                                 <Button
                                     variant="contained"
                                     fullWidth={true}
+                                    onClick={updateTodo}
                                 >
                                     Edit
                                 </Button>
@@ -75,6 +73,7 @@ export default function TodoItemComponent(){
                                 <Button
                                     variant="contained"
                                     fullWidth={true}
+                                    onClick={deleteTodo}
                                 >
                                     Delete
                                 </Button>

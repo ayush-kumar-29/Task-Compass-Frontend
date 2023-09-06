@@ -1,3 +1,5 @@
+import {BrowserRouter, Routes, Route} from "react-router-dom"
+
 import LoginComponent from "./login-components/LoginComponent"
 import SignupComponent from "./signup-components/SignupComponents"
 
@@ -15,9 +17,9 @@ import EditSprintComponent from "./sprint-components/EditSprintComponent"
 import CloseSprintComponent from "./sprint-components/CloseSprintComponent"
 import DeleteSprintComponent from "./sprint-components/DeleteSprintComponent"
 
-import TasksComponent from "./tasks-components/TasksComponent"
-import CreateTaskComponent from "./tasks-components/CreateTaskComponent"
-import ViewTaskComponent from "./tasks-components/ViewTaskComponent"
+// import TasksComponent from "./tasks-components/TasksComponent"
+// import CreateTaskComponent from "./tasks-components/CreateTaskComponent"
+// import ViewTaskComponent from "./tasks-components/ViewTaskComponent"
 
 import IssueComponent from "./issues-components/IssueComponent"
 import CreateIssueComponent from "./issues-components/CreateIssueComponent"
@@ -29,12 +31,16 @@ export default function WorkCompassApp(){
     return(
         <div>
             <NavBarComponent/>
+            <BrowserRouter>
+                <Routes>
+                    <Route path="/todos" element={<TodoComponent/>}/>
+                    <Route path="/addTodo" element={<AddTodoComponent/>}/>
+                    <Route path="/editTodo/:id" element={<EditTodoComponent/>}/>
+                </Routes>
+            </BrowserRouter>
             {/* <LoginComponent/> */}
             {/* <SignupComponent/> */}
             {/* <HomePageComponent/> */}
-            {/* <TodoComponent/> */}
-            {/* <AddTodoComponent/> */}
-            {/* <EditTodoComponent/> */}
             {/* <SprintComponent/> */}
             {/* <CreateSprintComponent/> */}
             {/* <EditSprintComponent/> */}
@@ -45,7 +51,7 @@ export default function WorkCompassApp(){
             {/* <ViewTaskComponent/> */}
             {/* <IssueComponent/> */}
             {/* <CreateIssueComponent/> */}
-            <ViewIssueComponent/>
+            {/* <ViewIssueComponent/> */}
         </div>
     )
 }
