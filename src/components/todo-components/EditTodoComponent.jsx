@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, CardContent, Grid, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
+import { callRetrieveTodoForIdApi, callUpdateTodoApi } from '../../api/TodoApiService';
 // import { makeStyles } from '@mui/styles';
 
 const cardStyle = ()=>({
@@ -17,18 +18,76 @@ const cardPosition = {
 }
 
 export default function EditTodoComponent(){
-    const [todo, setTodo] = useState()
+    const [todoDesc, setTodoDesc] = useState("")
+    const [descError, setDescError] = useState(false)
+    const [descHelperText, setDescHelperText] = useState()
+    const [dueDate, setDueDate] = useState()
+    const [dueDateError, setDueDateError] = useState(false)
+    const [dueDateHelperText, setDueDateHelperText] = useState()
+    const [initialValueFetched, setInitialValueFetched] = useState(false)
+    
     const params = useParams()
 
+    const navigate = useNavigate()
+
     useEffect(() => {
+        // console.log(params)
         // TODO: CHANGE USERNAME
-        callRetrieveTodoApi({userName:"user1", open:openFilter, completed:completedFilter})
+        if(!initialValueFetched){
+            callRetrieveTodoForIdApi(params.todoId, {userName:"user1"})
+            .then((resp) => {
+                setTodoDesc(resp.data.todoDescription)
+                setDueDate(resp.data.dueDate)
+            })
+            .catch((error) => console.log(error))
+            setInitialValueFetched(true)
+        }
+    })
+
+    function discardChanges(){
+        navigate("/todos")
+    }
+
+    function validateTodoContent(){
+        var makeApiCall=true
+
+        setDescError(false)
+        setDescHelperText(null)
+        if(todoDesc==undefined || (todoDesc!=undefined && todoDesc.length==0)){
+            makeApiCall=false
+            setDescError(true)
+            setDescHelperText("Description cannot be empty.")
+        }
+
+        setDueDateError(false)
+        setDueDateHelperText(null)
+        if(dueDate==undefined || (dueDate!=undefined && dueDate.length==0)){
+            makeApiCall=false
+            setDueDateError(true)
+            setDueDateHelperText("Due date cannot be empty.")
+        }
+
+        if(makeApiCall)
+            addTodo()
+    }
+
+    function addTodo(){
+        // TODO: CHANGE USER NAME
+        callUpdateTodoApi(params.todoId, {userName:"user1", updateType:"content"}, {todoDescription:todoDesc, dueDate})
         .then((resp) => {
-            // console.log(resp.data)
-            setTodo(resp.data)
+            console.log(resp)
+            navigate("/todos")
         })
         .catch((error) => console.log(error))
-    })
+    }
+
+    const onDescChanged = (event) => {
+        setTodoDesc(event.target.value);
+    };
+
+    const onDueDateChanged = (event) => {
+        setDueDate(event.target.value);
+    };
 
     return(
         <div style={cardPosition}>
@@ -48,29 +107,51 @@ export default function EditTodoComponent(){
                             <Grid item xs={12}>
                                 <TextField
                                     label="Description"
-                                    // error={true}
-                                    // helperText="Description is empty"
+                                    error={descError}
+                                    helperText={descHelperText}
+                                    fullWidth
+                                    InputLabelProps={{ shrink: true}}
                                     multiline
-                                    defaultValue="Default Value"
+                                    value={todoDesc}
                                     rows={4}
+                                    onChange={onDescChanged}
                                 />  
                             </Grid>
 
                             <Grid item xs={12}>
                                 <TextField
                                     label="Due By"
-                                    error={false}
-                                    helperText=""
-                                    type=''
+                                    error={dueDateError}
+                                    helperText={dueDateHelperText}
+                                    fullWidth
+                                    value={dueDate}
+                                    InputLabelProps={{ shrink: true}}
+                                    type='date'
+                                    onChange={onDueDateChanged}
                                 />
                             </Grid>
 
                             <Grid item xs={12}>
-                                <Button variant="contained"
-                                        fullWidth={true}
-                                >
-                                    Save
-                                </Button>
+                                <Grid container spacing={2}>
+                                    <Grid item xs={6}>
+                                        <Button 
+                                            variant="contained"
+                                            fullWidth={true}
+                                            onClick={discardChanges}
+                                        >
+                                            Discard
+                                        </Button>
+                                    </Grid>
+                                    <Grid item xs={6}>
+                                        <Button 
+                                            variant="contained"
+                                            fullWidth={true}
+                                            onClick={validateTodoContent}
+                                        >
+                                            Save
+                                        </Button>
+                                    </Grid>
+                                </Grid>
                             </Grid>
                         </Grid>
                     </CardContent>

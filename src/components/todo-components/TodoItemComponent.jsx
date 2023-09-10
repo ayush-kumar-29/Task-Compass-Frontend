@@ -24,7 +24,7 @@ export default function TodoItemComponent({todoId, todoDesc, dueDate, status}){
     }
 
     function updateTodo(){
-        navigate(`/todos/editTodo/${todoId}`)
+        navigate(`/editTodo/${todoId}`)
     }
 
     function deleteTodo(){

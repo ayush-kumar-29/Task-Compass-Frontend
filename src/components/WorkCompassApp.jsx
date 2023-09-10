@@ -35,7 +35,10 @@ export default function WorkCompassApp(){
                 <Routes>
                     <Route path="/todos" element={<TodoComponent/>}/>
                     <Route path="/addTodo" element={<AddTodoComponent/>}/>
-                    <Route path="/editTodo/:id" element={<EditTodoComponent/>}/>
+                    <Route path="/editTodo/:todoId" element={<EditTodoComponent/>}/>
+                    <Route path="/issues" element={<IssueComponent/>}/>
+                    <Route path="/addIssue" element={<CreateIssueComponent/>}/>
+                    <Route path="/viewIssue/:issueId" element={<ViewIssueComponent/>}/>
                 </Routes>
             </BrowserRouter>
             {/* <LoginComponent/> */}
@@ -49,9 +52,7 @@ export default function WorkCompassApp(){
             {/* <TasksComponent/> */}
             {/* <CreateTaskComponent/> */}
             {/* <ViewTaskComponent/> */}
-            {/* <IssueComponent/> */}
-            {/* <CreateIssueComponent/> */}
-            {/* <ViewIssueComponent/> */}
+            
         </div>
     )
 }

@@ -4,7 +4,7 @@ import Card from '@mui/material/Card';
 import {Grid} from '@mui/material';
 import TodoItemComponent from './TodoItemComponent';
 import { useNavigate } from 'react-router-dom';
-import { callRetrieveTodoApi } from '../../api/TodoApiService';
+import { callRetrieveTodoForFilterApi } from '../../api/TodoApiService';
 
 const gridPosition = {
     display: 'flex',
@@ -30,9 +30,8 @@ export default function TodoComponent(){
 
     useEffect(() => {
         // TODO: CHANGE USERNAME
-        callRetrieveTodoApi({userName:"user1", open:openFilter, completed:completedFilter})
+        callRetrieveTodoForFilterApi({userName:"user1", open:openFilter, completed:completedFilter})
         .then((resp) => {
-            // console.log(resp.data)
             updateTodosList(resp.data)
         })
         .catch((error) => console.log(error))

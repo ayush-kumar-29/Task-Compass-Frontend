@@ -1,7 +1,11 @@
 import {apiClient} from "./ApiClient"
 
-export function callRetrieveTodoApi(queryParams){
+export function callRetrieveTodoForFilterApi(queryParams){
     return apiClient.get("/todos", {params: queryParams})
+}
+
+export function callRetrieveTodoForIdApi(todoId, queryParams){
+    return apiClient.get(`/todos/${todoId}`, {params: queryParams})
 }
 
 export function callAddTodoApi(todo, queryParams){
@@ -16,11 +20,7 @@ export function callUpdateTodoStatusApi(id, queryParams){
     return apiClient.patch(`/todos/updateTodo/${id}`, {}, {params: queryParams})
 }
 
-export function callGetTodoApi(username, id){   
-    return apiClient.get(`/users/${username}/todos/${id}`)
-}
-
-export function callUpdateTodoApi(username, id, todo){
-    return apiClient.put(`/users/${username}/todos/${id}`, todo)
+export function callUpdateTodoApi(id, queryParams, todo){
+    return apiClient.patch(`/todos/updateTodo/${id}`, todo, {params: queryParams})
 }
 
