@@ -2,6 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Autocomplete, Button, CardContent, Checkbox, Chip, FormControlLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import {Grid} from '@mui/material';
+import { useNavigate } from 'react-router-dom';
+import { callUpdateWorkItemStatusApi } from '../../api/WorkItemApiService';
 
 const cardStyle = ()=>({
     width: 1200,
@@ -16,11 +18,35 @@ const cardPosition = {
 
 const sprintName="Sprint Name"
 
-export default function TaskItemComponent(){
-    const [status, setStatus]=useState("New")
-    const handleChange = (event) => {
-        setStatus(event.target.value);
-      };
+export default function WIItemComponent({workItemId, workItemTitle, dueDate, status, creatorName, onWorkItemStatusChanged}){
+    const statusList=["NEW", "ONGOING", "COMPLETED"]
+
+    const [workItemStatus, updateWorkItemStatus] = useState(status)
+    const [workItemStatusChangedFlag, updateWorkItemStatusChangedFlag]  = useState(false)
+
+    const navigate = useNavigate()
+    
+    function workItemStatusChanged(event){
+        updateWorkItemStatus(event.target.value)
+        updateWorkItemStatusChangedFlag(true)
+    }
+
+    function goToMoreInfo(){
+        navigate(`/viewWorkItem/${workItemId}`)
+    }
+
+    useEffect(() =>{
+        if(workItemStatusChangedFlag){
+            callUpdateWorkItemStatusApi(workItemId, {updateType:"status", newStatus:workItemStatus.replace(" ", "%20")})
+            .then((resp) => {
+                console.log(resp)
+            })
+            .catch((error) => console.log(error))
+            updateWorkItemStatusChangedFlag(false)
+            onWorkItemStatusChanged()
+        }
+    })
+    
     return(
         <div style={cardPosition}>
             <Card sx={cardStyle}>
@@ -37,12 +63,12 @@ export default function TaskItemComponent(){
                                 >
                                     <Grid item>
                                         <Typography variant="body1">
-                                            Task Id
+                                            {workItemId}
                                         </Typography>
                                     </Grid>
                                     <Grid item>
                                         <Typography variant="h6">
-                                            Task Title
+                                            {workItemTitle}
                                         </Typography>
                                     </Grid>
                                 </Grid>
@@ -55,30 +81,35 @@ export default function TaskItemComponent(){
                                     spacing={1}
                                 >
                                     <Grid item>
-                                        <Typography>Due Date: 20-08-2023</Typography>
+                                        <Typography>{`Due Date: ${dueDate}`}</Typography>
                                     </Grid>
                                     <Grid item>
-                                        <Typography>Assignee: <Chip label="User Name"/></Typography>
+                                        <Typography>Created By: <Chip label={creatorName}/></Typography>
                                     </Grid>
                                 </Grid>
                             </Grid>
                             <Grid item xs={2}>
-                                <Select
-                                    defaultValue="New"
-                                    value={status}
-                                    // label="Age"
-                                    onChange={handleChange}
+                                <TextField
+                                    select={true}
+                                    label="Status"
+                                    // disabled={true}
+                                    value={workItemStatus}
+                                    onChange={workItemStatusChanged}
                                     fullWidth={true}
-                                >
-                                    <MenuItem value={"New"}>New</MenuItem>
-                                    <MenuItem value={"Ongoing"}>Ongoing</MenuItem>
-                                    <MenuItem value={"Completed"}>Completed</MenuItem>
-                                </Select>
+                                    >
+                                    {
+                                        statusList.map((statusItem) => {
+                                            return (
+                                                <MenuItem value={statusItem} key={statusItem}>{statusItem}</MenuItem>
+                                            )
+                                        }
+                                    )}
+                                </TextField>
                             </Grid>
                             <Grid item xs={2}>
                                 <Button
                                     variant="contained"
-                                    // fullWidth={true}
+                                    onClick={goToMoreInfo}
                                 >
                                     More Info
                                 </Button>

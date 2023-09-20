@@ -5,6 +5,10 @@ export function callRetrieveIssuesForFilterApi(assigneeFilter, newFilter, inProg
         inProgress:inProgressFilter, resolved:resolvedFilter}})
 }
 
+export function callRetrieveIssueCountApi(queryParams){
+    return apiClient.get("/issues/countByType", {params: queryParams})
+}
+
 export function callAddIssueApi(issue){
     return apiClient.post("issues/addIssue", issue)
 }

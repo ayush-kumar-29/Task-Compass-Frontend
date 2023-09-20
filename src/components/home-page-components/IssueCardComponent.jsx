@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, CardContent, Grid, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import issue_image from "../../assets/issue-image.png"
+import { useNavigate } from 'react-router-dom';
+import { callRetrieveIssueCountApi } from '../../api/IssueApiService';
 
 const cardStyle = ()=>({
-    // width: 200,
+    width: 200,
     // height: 300,
     borderRadius: 2,
 });
@@ -22,7 +24,32 @@ const imageStyle={
     justifyContent:"center"
 }
 
-export default function IssuesCardComponent(){
+export default function IssueCardComponent(){
+    const navigate = useNavigate()
+
+    const [issueCount, updateIssueCount] = useState(0)
+
+    function goToIssuesPage(){
+        navigate("/issues")
+    }
+
+    useEffect(() => {
+        // TODO: CHANGE USER NAME
+        var count=0
+        callRetrieveIssueCountApi({userName:"user1", status:"NEW"})
+        .then((resp) => {
+            count+=resp.data
+        })
+        .catch((error) => console.log(error))
+
+        // TODO: CHANGE USER NAME
+        callRetrieveIssueCountApi({userName:"user1", status:"IN%20PROGRESS"})
+        .then((resp) => {
+            count+=resp.data
+            updateIssueCount(count)
+        })
+        .catch((error) => console.log(error))
+    }, [issueCount])
     return(
         <div style={cardPosition}>
             <Card sx={cardStyle}>
@@ -39,12 +66,14 @@ export default function IssuesCardComponent(){
                             </Grid>
 
                             <Grid item xs={2}>
-                                <Typography>{"Pending Issues: 4"}</Typography>
+                                <Typography>{`Pending Issues: ${issueCount}`}</Typography>
                             </Grid>
 
                             <Grid item>
-                                <Button variant="contained"
-                                        fullWidth={true}
+                                <Button 
+                                    variant="contained"
+                                    fullWidth={true}
+                                    onClick={goToIssuesPage}
                                 >
                                     My Issues
                                 </Button>

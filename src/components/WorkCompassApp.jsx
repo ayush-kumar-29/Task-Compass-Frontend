@@ -17,9 +17,9 @@ import EditSprintComponent from "./sprint-components/EditSprintComponent"
 import CloseSprintComponent from "./sprint-components/CloseSprintComponent"
 import DeleteSprintComponent from "./sprint-components/DeleteSprintComponent"
 
-// import TasksComponent from "./tasks-components/TasksComponent"
-// import CreateTaskComponent from "./tasks-components/CreateTaskComponent"
-// import ViewTaskComponent from "./tasks-components/ViewTaskComponent"
+import WorkItemComponent from "./workitem-components/WorkItemComponent"
+import CreateWorkItemComponent from "./workitem-components/CreateWorkItemComponent"
+import ViewWorkItemComponent from "./workitem-components/ViewWorkItemComponent"
 
 import IssueComponent from "./issues-components/IssueComponent"
 import CreateIssueComponent from "./issues-components/CreateIssueComponent"
@@ -33,26 +33,25 @@ export default function WorkCompassApp(){
             <NavBarComponent/>
             <BrowserRouter>
                 <Routes>
+                    <Route path="/home" element={<HomePageComponent/>}/>
                     <Route path="/todos" element={<TodoComponent/>}/>
                     <Route path="/addTodo" element={<AddTodoComponent/>}/>
                     <Route path="/editTodo/:todoId" element={<EditTodoComponent/>}/>
                     <Route path="/issues" element={<IssueComponent/>}/>
                     <Route path="/addIssue" element={<CreateIssueComponent/>}/>
                     <Route path="/viewIssue/:issueId" element={<ViewIssueComponent/>}/>
+                    <Route path="/workItems" element={<WorkItemComponent/>}/>
+                    <Route path="/addWorkItem" element={<CreateWorkItemComponent/>}/>
+                    <Route path="/viewWorkItem/:workItemId" element={<ViewWorkItemComponent/>}/>
+                    <Route path="/sprints" element={<SprintComponent/>}/>
+                    <Route path="/createSprint" element={<CreateSprintComponent/>}/>
+                    <Route path="/editSprint/:sprintId" element={<EditSprintComponent/>}/>
+                    <Route path="/closeSprint" element={<CloseSprintComponent/>}/>
+                    <Route path="/deleteSprint" element={<DeleteSprintComponent/>}/>
                 </Routes>
             </BrowserRouter>
             {/* <LoginComponent/> */}
             {/* <SignupComponent/> */}
-            {/* <HomePageComponent/> */}
-            {/* <SprintComponent/> */}
-            {/* <CreateSprintComponent/> */}
-            {/* <EditSprintComponent/> */}
-            {/* <CloseSprintComponent/> */}
-            {/* <DeleteSprintComponent/> */}
-            {/* <TasksComponent/> */}
-            {/* <CreateTaskComponent/> */}
-            {/* <ViewTaskComponent/> */}
-            
         </div>
     )
 }

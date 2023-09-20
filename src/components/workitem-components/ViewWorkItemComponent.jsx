@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { Autocomplete, Button, CardContent, Grid, MenuItem, Select, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
-import { callRetrieveUserNamesApi } from '../../api/UserApiService';
 import { useNavigate, useParams } from 'react-router-dom';
-import { callDeleteIssueApi, callRetrieveIssueForIdApi, callUpdateIssueApi } from '../../api/IssueApiService';
+import { callRetrieveUserNamesApi } from '../../api/UserApiService';
+import { callRetrieveSprintNamesApi } from '../../api/SprintApiService';
+import { callDeleteWorkItemApi, callRetrieveWorkItemForIdApi, callUpdateWorkItemApi } from '../../api/WorkItemApiService';
 // import { makeStyles } from '@mui/styles';
 
 const cardStyle = ()=>({
@@ -18,15 +19,16 @@ const cardPosition = {
     marginTop:30,
 }
 
-export default function ViewIssueComponent(){
-    const statusList=["NEW", "IN PROGRESS", "RESOLVED"]
-    const severityList=["LOW", "MEDIUM", "HIGH"]
+export default function ViewWorkItemComponent(){
+    const statusList=["NEW", "ONGOING", "CLOSED"]
+    const priorityList=["HIGH", "MEDIUM", "LOW"]
 
     const navigate = useNavigate()
 
     const params = useParams()
-
+    
     const [assigneeList, setAssigneeList] = useState([])
+    const [sprintList, updateSprintList] = useState([])
     const [viewModeEnabled, setViewModeEnabled] = useState(true)
 
     const [title, updateTitle] = useState('')
@@ -37,13 +39,17 @@ export default function ViewIssueComponent(){
     const [descError, setDescError] = useState(false)
     const [descHelperText, setDescHelperText] = useState()
 
+    const [sprint, updateSprint] = useState('')
+    const [sprintError, setSprintError] = useState(false)
+    const [sprintHelperText, setSprintHelperText] = useState()
+
     const [status, updateStatus] = useState('')
     const [statusError, setStatusError] = useState(false)
     const [statusHelperText, setStatusHelperText] = useState()
     
-    const [severity, updateSeverity] = useState('')
-    const [severityError, setSeverityError] = useState(false)
-    const [severityHelperText, setSeverityHelperText] = useState()
+    const [priority, updatePriority] = useState('')
+    const [priorityError, setPriorityError] = useState(false)
+    const [priorityHelperText, setPriorityHelperText] = useState()
 
     const [assignee, updateAssignee] = useState('')
     const [assigneeError, setAssigneeError] = useState(false)
@@ -57,42 +63,9 @@ export default function ViewIssueComponent(){
     const [creationDate, updateCreationDate] = useState('')
     const [initialValuesFetched, setInitialValuesFetched] = useState(false)
 
-    function onTitleChanged(event){
-        updateTitle(event.target.value)
-    }
-
-    function onDescChanged(event){
-        updateDesc(event.target.value)
-    }
-
-    function onStatusChanged(event){
-        updateStatus(event.target.value)
-    }
-
-    function onSeverityChanged(event){
-        updateSeverity(event.target.value)
-    }
-
-    function onDueDateChanged(event){
-        updateDueDate(event.target.value)
-    }
-
-    function enableEditMode(){
-        setViewModeEnabled(false)
-    }
-
-    function backOrDiscardClicked(){
+    function validateWorkItemContent(){
         if(viewModeEnabled)
-            navigate("/issues")    
-        else{
-            setViewModeEnabled(true)
-            setInitialValuesFetched(false)
-        }
-    }
-
-    function validateIssueContent(){
-        if(viewModeEnabled)
-            navigate("/issues")  
+            navigate("/workItems")
         var makeApiCall=true
 
         setTitleError(false)
@@ -119,12 +92,20 @@ export default function ViewIssueComponent(){
             setStatusHelperText("Status cannot be empty.")
         }
         
-        setSeverityError(false)
-        setSeverityHelperText(null)
-        if(severity==null || severity==''){
+        setSprintError(false)
+        setSprintHelperText(null)
+        if(sprint==null || sprint==''){
             makeApiCall=false
-            setSeverityError(true)
-            setSeverityHelperText("Severity cannot be empty.")
+            setSprintError(true)
+            setSprintHelperText("Severity cannot be empty.")
+        }
+
+        setPriorityError(false)
+        setPriorityHelperText(null)
+        if(priority==null || priority==''){
+            makeApiCall=false
+            setPriorityError(true)
+            setPriorityHelperText("Severity cannot be empty.")
         }
 
         setAssigneeError(false)
@@ -144,19 +125,20 @@ export default function ViewIssueComponent(){
         }
 
         if(makeApiCall)
-            updateIssue()
+            updateWorkItem()
     }
 
-    function updateIssue(){
+    function updateWorkItem(){
         // TODO: CHANGE USER NAME
-        callUpdateIssueApi(
-            params.issueId,
+        callUpdateWorkItemApi(
+            params.workItemId,
             {
-                issueTitle: title,
-                issueDescription: desc,
+                workItemTitle: title,
+                workItemDescription: desc,
                 dueDate: dueDate,
                 status: status,
-                severity: severity,
+                priority: priority,
+                sprint: sprint,
                 assigneeName: assignee
             },
             {
@@ -165,20 +147,68 @@ export default function ViewIssueComponent(){
             }
         )
         .then((resp) => {
-            navigate("/issues")
+            navigate("/workItems")
             // setViewModeEnabled(true)
             // setInitialValuesFetched(false)
         })
         .catch((error) => console.log(error))
     }
 
-    function deleteIssue(){
-        callDeleteIssueApi(params.issueId)
+    function onTitleChanged(event){
+        updateTitle(event.target.value)
+    }
+
+    function onDescChanged(event){
+        updateDesc(event.target.value)
+    }
+
+    function onStatusChanged(event){
+        updateStatus(event.target.value)
+    }
+
+    function onPriorityChanged(event){
+        updatePriority(event.target.value)
+    }
+
+    function onDueDateChanged(event){
+        updateDueDate(event.target.value)
+    }
+
+    function enableEditMode(){
+        setViewModeEnabled(false)
+    }
+
+    function backOrDiscardClicked(){
+        if(viewModeEnabled)
+            navigate("/workItems")    
+        else{
+            setViewModeEnabled(true)
+            setInitialValuesFetched(false)
+            setTitleError(false)
+            setTitleHelperText(null)
+            setDescError(false)
+            setDescHelperText(null)
+            setStatusError(false)
+            setStatusHelperText(null)
+            setSprintError(false)
+            setSprintHelperText(null)
+            setPriorityError(false)
+            setPriorityHelperText(null)
+            setAssigneeError(false)
+            setAssigneeHelperText(null)
+            setDueDateError(false)
+            setDueDateHelperText(null)
+        }
+    }
+
+    function deleteWorkItem(){
+        callDeleteWorkItemApi(params.workItemId)
         .then((resp) => {
-            navigate("/issues")
+            navigate("/workItems")
         })
         .catch((error) => console.log(error))
     }
+
     
     useEffect(() => {
         if(!initialValuesFetched){
@@ -188,12 +218,20 @@ export default function ViewIssueComponent(){
             })
             .catch((error) => console.log(error))
 
-            callRetrieveIssueForIdApi(params.issueId)
+            callRetrieveSprintNamesApi()
             .then((resp) => {
-                updateTitle(resp.data.issueTitle)
-                updateDesc(resp.data.issueDescription)
+                updateSprintList(resp.data)
+            })
+            .catch((error) => console.log(error))
+
+            callRetrieveWorkItemForIdApi(params.workItemId)
+            .then((resp) => {
+                console.log(resp)
+                updateTitle(resp.data.workItemTitle)
+                updateDesc(resp.data.workItemDescription)
                 updateStatus(resp.data.status)
-                updateSeverity(resp.data.severity)
+                updatePriority(resp.data.priority)
+                updateSprint(resp.data.sprint)
                 updateAssignee(resp.data.assigneeName)
                 updateDueDate(resp.data.dueDate)
                 updateCreatorName(resp.data.creatorName)
@@ -204,7 +242,7 @@ export default function ViewIssueComponent(){
             setInitialValuesFetched(true)
         }
     })
-    
+
     return(
         <div style={cardPosition}>
             <Card sx={cardStyle}>
@@ -223,24 +261,23 @@ export default function ViewIssueComponent(){
                                 <Grid item xs={4}></Grid>
                                 <Grid item xs={4}>
                                     <Typography variant="h5">
-                                        Issue Id
+                                        Task Id
                                     </Typography> 
                                 </Grid>
                                 <Grid item xs={2}>
-                                   {viewModeEnabled && 
                                     <Button 
                                         variant="contained"
                                         fullWidth={true}
                                         onClick={enableEditMode}
                                     >
                                         Edit
-                                    </Button>}
+                                    </Button>
                                 </Grid>
                                 <Grid item xs={2}>
                                     <Button 
                                         variant="contained"
                                         fullWidth={true}
-                                        onClick={deleteIssue}
+                                        onClick={deleteWorkItem}
                                     >
                                         Delete
                                     </Button>
@@ -259,12 +296,11 @@ export default function ViewIssueComponent(){
                                             <TextField
                                                 label="Title"
                                                 error={titleError}
+                                                value={title}
                                                 fullWidth={true}
                                                 helperText={titleHelperText}
-                                                value={title}
                                                 onChange={onTitleChanged}
                                                 disabled={viewModeEnabled}
-                                                InputLabelProps={{ shrink: true}}
                                             />
                                         </Grid>
 
@@ -275,11 +311,35 @@ export default function ViewIssueComponent(){
                                                 helperText={descHelperText}
                                                 multiline
                                                 fullWidth={true}
-                                                rows={6}
+                                                rows={2.75}
                                                 value={desc}
                                                 onChange={onDescChanged}
                                                 disabled={viewModeEnabled}
-                                                InputLabelProps={{ shrink: true}}
+                                            />
+                                        </Grid>
+
+                                        <Grid item xs={12}>
+                                            <Autocomplete
+                                                disablePortal
+                                                options={sprintList}
+                                                fullWidth={true}
+                                                disabled={viewModeEnabled}
+                                                value={sprint}
+                                                onChange={(event, newInputValue) => {
+                                                    updateSprint(newInputValue)
+                                                }}
+                                                onInputChange={(event, newInputValue) => {
+                                                    updateSprint(newInputValue)
+                                                }}
+                                                renderInput={
+                                                    (params) => 
+                                                        <TextField
+                                                            {...params} 
+                                                            label="Sprint"
+                                                            error={sprintError}
+                                                            helperText={sprintHelperText}
+                                                        />
+                                                }    
                                             />
                                         </Grid>
 
@@ -288,12 +348,12 @@ export default function ViewIssueComponent(){
                                                 label="Due Date"
                                                 error={dueDateError}
                                                 fullWidth={true}
+                                                value={dueDate}
                                                 helperText={dueDateHelperText}
                                                 type='date'
-                                                value={dueDate}
+                                                InputLabelProps={{ shrink: true}}
                                                 onChange={onDueDateChanged}
                                                 disabled={viewModeEnabled}
-                                                InputLabelProps={{ shrink: true}}
                                             />
                                         </Grid>
                                     </Grid>
@@ -308,14 +368,14 @@ export default function ViewIssueComponent(){
                                                 select
                                                 label="Status"
                                                 fullWidth={true}
-                                                value={status}
                                                 error={statusError}
+                                                value={status}
                                                 helperText={statusHelperText}
                                                 onChange={onStatusChanged}
                                                 disabled={viewModeEnabled}
                                             >
                                                 {statusList.map((statusItem) => {return (
-                                                    <MenuItem value={statusItem} key={statusItem}>{statusItem}</MenuItem>
+                                                    <MenuItem value={statusItem}>{statusItem}</MenuItem>
                                                 )})}
                                             </TextField>
                                         </Grid>
@@ -323,18 +383,16 @@ export default function ViewIssueComponent(){
                                         <Grid item xs={12}>
                                             <TextField
                                                 select={true}
-                                                label="Severity"
-                                                // disabled={true}
-                                                // defaultValue="High"
-                                                value={severity}
-                                                error={severityError}
-                                                helperText={severityHelperText}
+                                                label="Priority"
+                                                error={priorityError}
+                                                helperText={priorityHelperText}
+                                                value={priority}
                                                 fullWidth={true}
-                                                onChange={onSeverityChanged}
+                                                onChange={onPriorityChanged}
                                                 disabled={viewModeEnabled}
-                                                >
-                                                {severityList.map((severityItem) => {return (
-                                                    <MenuItem value={severityItem} key={severityItem}>{severityItem}</MenuItem>
+                                            >
+                                                {priorityList.map((priorityList) => {return (
+                                                    <MenuItem value={priorityList}>{priorityList}</MenuItem>
                                                 )})}
                                             </TextField>
                                         </Grid>
@@ -356,7 +414,7 @@ export default function ViewIssueComponent(){
                                                     (params) => 
                                                         <TextField 
                                                             {...params} 
-                                                            label="Assignee"
+                                                            label="Assignee" 
                                                             error={assigneeError}
                                                             helperText={assigneeHelperText}
                                                         />
@@ -415,7 +473,7 @@ export default function ViewIssueComponent(){
                                     <Button 
                                         variant="contained"
                                         fullWidth={true}
-                                        onClick={validateIssueContent}
+                                        onClick={validateWorkItemContent}
                                     >
                                         Save
                                     </Button>

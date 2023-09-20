@@ -19,8 +19,8 @@ const gridPosition = {
 export default function IssueComponent(){
     const navigate = useNavigate()
     const [userNames, setUserNames] = useState([])
-    const [newFilter, updateNewFilterStatus] = useState(true)
-    const [inProgressFilter, updateInProgressFilterStatus] = useState(false)
+    const [newFilter, updateNewFilterStatus] = useState(false)
+    const [inProgressFilter, updateInProgressFilterStatus] = useState(true)
     const [resolvedFilter, updateResolvedFilterStatus] = useState(false)
     const [filterModified, setfilterModified] = useState(true)
     const [issueStatusChanged, setIssueStatusChanged] = useState(false)

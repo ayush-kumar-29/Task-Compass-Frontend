@@ -2,8 +2,9 @@ import React, { useEffect, useState } from 'react';
 import { Autocomplete, Button, CardContent, Grid, MenuItem, Select, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import { useNavigate } from 'react-router-dom';
-import { callRetrieveUserNamesApi, callValidateUserNamesApi } from '../../api/UserApiService';
-import { callAddIssueApi } from '../../api/IssueApiService';
+import { callRetrieveSprintNamesApi } from '../../api/SprintApiService';
+import { callRetrieveUserNamesApi } from '../../api/UserApiService';
+import { callAddWorkItemApi } from '../../api/WorkItemApiService';
 // import { makeStyles } from '@mui/styles';
 
 const cardStyle = ()=>({
@@ -18,9 +19,7 @@ const cardPosition = {
     marginTop:30,
 }
 
-export default function CreateIssueComponent(){
-    // const assigneeList=["User-1", "User-2", "User-3"]
-    const priority=["HIGH", "MEDIUM", "LOW"]
+export default function CreateWorkItemComponent(){
     const navigate = useNavigate()
 
     const [title, updateTitle] = useState()
@@ -31,20 +30,44 @@ export default function CreateIssueComponent(){
     const [descError, setDescError] = useState(false)
     const [descHelperText, setDescHelperText] = useState()
 
-    const [severity, updateSeverity] = useState('')
-    const [severityError, setSeverityError] = useState(false)
-    const [severityHelperText, setSeverityHelperText] = useState()
+    const [priority, updatePriority] = useState('')
+    const [priorityError, setPriorityError] = useState(false)
+    const [priorityHelperText, setPriorityHelperText] = useState()
 
     const [assignee, updateAssignee] = useState()
     const [assigneeError, setAssigneeError] = useState(false)
     const [assigneeHelperText, setAssigneeHelperText] = useState()
 
+    const [sprint, updateSprint] = useState()
+    const [sprintError, setSprintError] = useState(false)
+    const [sprintHelperText, setSprintHelperText] = useState()
+
     const [dueDate, updateDueDate] = useState()
     const [dueDateError, setDueDateError] = useState(false)
     const [dueDateHelperText, setDueDateHelperText] = useState()
 
-    const [assigneeList, setAssigneeList] = useState([])
-    const [userListFetched, setUserListFetched] = useState(false)
+    const [sprintList, updateSprintList] = useState([])
+    const [assigneeList, updateAssigneeList] = useState([])
+    const [initialValuesFetched, setInitialValuesFetched] = useState(false)
+    
+    const priorityList=["HIGH", "MEDIUM", "LOW"]
+
+    useEffect(() => {
+        if(!initialValuesFetched){
+            callRetrieveSprintNamesApi()
+            .then((resp) => {
+                updateSprintList(resp.data)
+            })
+            .catch((error) => console.log(error))
+
+            callRetrieveUserNamesApi()
+            .then((resp) => {
+                updateAssigneeList(resp.data)
+            })
+            .catch((error) => console.log(error))
+            setInitialValuesFetched(false)
+        }
+    })
 
     function validateIssueContent(){
         var makeApiCall=true
@@ -65,12 +88,20 @@ export default function CreateIssueComponent(){
             setDescHelperText("Description cannot be empty.")
         }
 
-        setSeverityError(false)
-        setSeverityHelperText(null)
-        if(severity==null || severity==''){
+        setPriorityError(false)
+        setPriorityHelperText(null)
+        if(priority==null || priority==''){
             makeApiCall=false
-            setSeverityError(true)
-            setSeverityHelperText("Severity cannot be empty.")
+            setPriorityError(true)
+            setPriorityHelperText("Priority cannot be empty.")
+        }
+
+        setSprintError(false)
+        setSprintHelperText(null)
+        if(sprint==null || sprint==''){
+            makeApiCall=false
+            setSprintError(true)
+            setSprintHelperText("Sprint cannot be empty.")
         }
 
         setAssigneeError(false)
@@ -86,11 +117,11 @@ export default function CreateIssueComponent(){
         if(dueDate==null){
             makeApiCall=false
             setDueDateError(true)
-            setDueDateHelperText("Assignee cannot be empty.")
+            setDueDateHelperText("Due Date cannot be empty.")
         }
 
         if(makeApiCall)
-            addIssue()
+            addWorkItem()
     }
 
     function onTitleChanged(event){
@@ -101,47 +132,36 @@ export default function CreateIssueComponent(){
         updateDesc(event.target.value)
     }
 
-    function onSeverityChanged(event){
-        updateSeverity(event.target.value)
+    function onPriorityChanged(event){
+        updatePriority(event.target.value)
     }
 
     function onDueDateChanged(event){
         updateDueDate(event.target.value)
     }
 
-    useEffect(() => {
-        if(!userListFetched){
-            callRetrieveUserNamesApi()
-            .then((resp) => {
-                setAssigneeList(resp.data)
-            })
-            .catch((error) => console.log(error))
-            setUserListFetched(true)
-        }
-    })
-
-    function addIssue(){
-        // TODO: CHANGE USER NAME
-        callAddIssueApi(
+    function addWorkItem(){
+        callAddWorkItemApi(
             {
-                issueTitle: title,
-                issueDescription: desc,
+                workItemTitle: title,
+                workItemDescription: desc,
                 dueDate: dueDate, 
-                severity: severity,
+                priority: priority,
+                sprint:sprint,
                 assigneeName: assignee,
+                status: "NEW",
                 // TODO: CHANGE USER NAME
                 creatorName: "user1"
             }
         )
         .then((resp) => {
-            navigate("/issues")
+            navigate("/workItems")
         })
         .catch((error) => console.log(error))
     }
 
-
     function discardChanges(){
-        navigate("/issues")
+        navigate("/workItems")
     }
     return(
         <div style={cardPosition}>
@@ -159,7 +179,7 @@ export default function CreateIssueComponent(){
                             >
                                 <Grid item xs={12}>
                                     <Typography variant="h5">
-                                        Create Issue
+                                        Create Task
                                     </Typography> 
                                 </Grid>
                             </Grid>
@@ -167,7 +187,7 @@ export default function CreateIssueComponent(){
 
                         <Grid item xs={12}>
                             <Grid container
-                                spacing={3}
+                                spacing={2}
                             >
                                 <Grid item xs={6}>
                                     <Grid container
@@ -189,7 +209,7 @@ export default function CreateIssueComponent(){
                                                 helperText={descHelperText}
                                                 multiline
                                                 fullWidth={true}
-                                                rows={3}
+                                                rows={6}
                                                 onChange={onDescChanged}
                                             />
                                         </Grid>
@@ -198,21 +218,20 @@ export default function CreateIssueComponent(){
                                 
                                 <Grid item xs={6}>
                                     <Grid container
-                                        spacing={2.3}
+                                        spacing={2.1}
                                     >
                                         <Grid item xs={12}>
                                             <TextField
                                                 select
-                                                label="Severity"
+                                                label="Priority"
                                                 size="small"
-                                                value={severity}
-                                                error={severityError}
-                                                helperText={severityHelperText}
                                                 fullWidth={true}
-                                                onChange={onSeverityChanged}
+                                                error={priorityError}
+                                                helperText={priorityHelperText}
+                                                onChange={onPriorityChanged}
                                                 >
-                                                {priority.map((priority) => {return (
-                                                    <MenuItem value={priority} key={priority}>{priority}</MenuItem>
+                                                {priorityList.map((priorityItem) => {return (
+                                                    <MenuItem value={priorityItem} key={priorityItem}>{priorityItem}</MenuItem>
                                                 )})}
                                             </TextField>
                                         </Grid>
@@ -222,21 +241,32 @@ export default function CreateIssueComponent(){
                                                 options={assigneeList}
                                                 size="small"
                                                 fullWidth={true}
+                                                error={assigneeError}
+                                                helperText={assigneeHelperText}
                                                 onChange={(event, newInputValue) => {
                                                     updateAssignee(newInputValue)
                                                 }}
                                                 onInputChange={(event, newInputValue) => {
                                                     updateAssignee(newInputValue)
                                                 }}
-                                                renderInput={
-                                                    (params) => 
-                                                        <TextField 
-                                                            {...params} 
-                                                            label="Assignee" 
-                                                            error={assigneeError}
-                                                            helperText={assigneeHelperText}
-                                                    />
-                                                }    
+                                                renderInput={(params) => <TextField {...params} label="Assignee" />}    
+                                            />
+                                        </Grid>
+
+                                        <Grid item xs={12}>
+                                            <Autocomplete
+                                                disablePortal
+                                                options={sprintList}
+                                                fullWidth={true}
+                                                error={sprintError}
+                                                helperText={sprintHelperText}
+                                                onChange={(event, newInputValue) => {
+                                                    updateSprint(newInputValue)
+                                                }}
+                                                onInputChange={(event, newInputValue) => {
+                                                    updateSprint(newInputValue)
+                                                }}
+                                                renderInput={(params) => <TextField {...params} label="Sprint" />}    
                                             />
                                         </Grid>
 
@@ -244,7 +274,7 @@ export default function CreateIssueComponent(){
                                             <TextField
                                                 label="Due Date"
                                                 error={dueDateError}
-                                                fullWidth={true}
+                                                fullWidth
                                                 helperText={dueDateHelperText}
                                                 InputLabelProps={{ shrink: true}}
                                                 type='date'

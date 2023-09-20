@@ -8,6 +8,10 @@ export function callRetrieveTodoForIdApi(todoId, queryParams){
     return apiClient.get(`/todos/${todoId}`, {params: queryParams})
 }
 
+export function callRetrievTodosCountApi(queryParams){
+    return apiClient.get("/todos/countByType", {params: queryParams})
+}
+
 export function callAddTodoApi(todo, queryParams){
     return apiClient.post("todos/addTodo", todo, {params: queryParams})
 }

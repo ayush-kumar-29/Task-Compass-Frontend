@@ -93,9 +93,13 @@ export default function IssueItemComponent({issueId, issueTitle, severity, creat
                                 onChange={issueStatusChanged}
                                 fullWidth={true}
                                 >
-                                {statusList.map((statusItem) => {return (
-                                    <MenuItem value={statusItem} key={statusItem}>{statusItem}</MenuItem>
-                                )})}
+                                {
+                                    statusList.map((statusItem) => {
+                                        return (
+                                            <MenuItem value={statusItem} key={statusItem}>{statusItem}</MenuItem>
+                                        )
+                                    }
+                                )}
                             </TextField>
                         </Grid>
                         <Grid item xs={2}>
