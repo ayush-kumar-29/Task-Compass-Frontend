@@ -19,10 +19,17 @@ export default function TodoComponent(){
     const navigate = useNavigate()
     const [openFilter, updateOpenFilterStatus] = useState(true)
     const [completedFilter, updateCompletedFilterStatus] = useState(false)
+    const [onFiltersChanged, updateOnFiltersChanged] = useState(true)
     const [todosList, updateTodosList] = useState([])
 
-    const openFilterChanged =(event) => updateOpenFilterStatus(event.target.checked)
-    const completedFilterChanged =(event) => updateCompletedFilterStatus(event.target.checked)
+    const openFilterChanged =(event) => {
+        updateOpenFilterStatus(event.target.checked)
+        updateOnFiltersChanged(true)
+    }
+    const completedFilterChanged =(event) => {
+        updateCompletedFilterStatus(event.target.checked)
+        updateOnFiltersChanged(true)
+    }
 
     function addNewTodo(){
         navigate("/addTodo")
@@ -30,11 +37,14 @@ export default function TodoComponent(){
 
     useEffect(() => {
         // TODO: CHANGE USERNAME
-        callRetrieveTodoForFilterApi({userName:"user1", open:openFilter, completed:completedFilter})
-        .then((resp) => {
-            updateTodosList(resp.data)
-        })
-        .catch((error) => console.log(error))
+        if(onFiltersChanged){
+            callRetrieveTodoForFilterApi({userName:"user1", open:openFilter, completed:completedFilter})
+            .then((resp) => {
+                updateTodosList(resp.data)
+            })
+            .catch((error) => console.log(error))
+            updateOnFiltersChanged(false)
+        }
     })
 
     return(

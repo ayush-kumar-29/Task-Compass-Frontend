@@ -1,4 +1,4 @@
-import {BrowserRouter, Routes, Route} from "react-router-dom"
+import {BrowserRouter, Routes, Route, Navigate} from "react-router-dom"
 
 import LoginComponent from "./login-components/LoginComponent"
 import SignupComponent from "./signup-components/SignupComponents"
@@ -24,34 +24,113 @@ import ViewWorkItemComponent from "./workitem-components/ViewWorkItemComponent"
 import IssueComponent from "./issues-components/IssueComponent"
 import CreateIssueComponent from "./issues-components/CreateIssueComponent"
 import ViewIssueComponent from "./issues-components/ViewIssueComponent"
+import { useContext } from "react"
+import AuthProvider, { AuthContext } from "../auth/AuthContext"
+import LogoutComponent from "./logout-components/LogoutComponent"
 
-
+function AuthenticatedRoute({children}){
+    const authContext = useContext(AuthContext)
+    console.log("authContext.isAuthenticated - "+authContext.isAuthenticated)
+    if(authContext.isAuthenticated){
+        return (children)
+    }
+    else return <Navigate to="/"/>
+}
 
 export default function WorkCompassApp(){
     return(
         <div>
-            <NavBarComponent/>
-            <BrowserRouter>
-                <Routes>
-                    <Route path="/home" element={<HomePageComponent/>}/>
-                    <Route path="/todos" element={<TodoComponent/>}/>
-                    <Route path="/addTodo" element={<AddTodoComponent/>}/>
-                    <Route path="/editTodo/:todoId" element={<EditTodoComponent/>}/>
-                    <Route path="/issues" element={<IssueComponent/>}/>
-                    <Route path="/addIssue" element={<CreateIssueComponent/>}/>
-                    <Route path="/viewIssue/:issueId" element={<ViewIssueComponent/>}/>
-                    <Route path="/workItems" element={<WorkItemComponent/>}/>
-                    <Route path="/addWorkItem" element={<CreateWorkItemComponent/>}/>
-                    <Route path="/viewWorkItem/:workItemId" element={<ViewWorkItemComponent/>}/>
-                    <Route path="/sprints" element={<SprintComponent/>}/>
-                    <Route path="/createSprint" element={<CreateSprintComponent/>}/>
-                    <Route path="/editSprint/:sprintId" element={<EditSprintComponent/>}/>
-                    <Route path="/closeSprint" element={<CloseSprintComponent/>}/>
-                    <Route path="/deleteSprint" element={<DeleteSprintComponent/>}/>
-                </Routes>
-            </BrowserRouter>
-            {/* <LoginComponent/> */}
-            {/* <SignupComponent/> */}
+            <AuthProvider>
+                <BrowserRouter>
+                    <div>
+                        {/* <AuthenticatedRoute> */}
+                            <NavBarComponent/>
+                        {/* </AuthenticatedRoute> */}
+                        <Routes>
+                            <Route path="/" element={<LoginComponent/>}/>
+                            <Route path="/login" element={<LoginComponent/>}/>
+                            <Route path="/signup" element={<SignupComponent/>}/>
+                            <Route path="/logout" element={<LogoutComponent/>}/>
+
+                            <Route path="/home" element={
+                                <AuthenticatedRoute>
+                                    <HomePageComponent/>
+                                </AuthenticatedRoute>
+                            }/>
+                            <Route path="/todos" element={
+                                <AuthenticatedRoute>
+                                    <TodoComponent/>
+                                </AuthenticatedRoute>
+                            }/>
+                            <Route path="/addTodo" element={
+                                <AuthenticatedRoute>
+                                    <AddTodoComponent/>
+                                </AuthenticatedRoute>
+                            }/>
+                            <Route path="/editTodo/:todoId" element={
+                                <AuthenticatedRoute>
+                                    <EditTodoComponent/>
+                                </AuthenticatedRoute>
+                            }/>
+                            <Route path="/issues" element={
+                                <AuthenticatedRoute>
+                                    <IssueComponent/>
+                                </AuthenticatedRoute>
+                            }/>
+                            <Route path="/addIssue" element={
+                                <AuthenticatedRoute>
+                                    <CreateIssueComponent/>
+                                </AuthenticatedRoute>
+                            }/>
+                            <Route path="/viewIssue/:issueId" element={
+                                <AuthenticatedRoute>
+                                    <ViewIssueComponent/>
+                                </AuthenticatedRoute>
+                            }/>
+                            <Route path="/workItems" element={
+                                <AuthenticatedRoute>
+                                    <WorkItemComponent/>
+                                </AuthenticatedRoute>
+                            }/>
+                            <Route path="/addWorkItem" element={
+                                <AuthenticatedRoute>
+                                    <CreateWorkItemComponent/>
+                                </AuthenticatedRoute>
+                            }/>
+                            <Route path="/viewWorkItem/:workItemId" element={
+                                <AuthenticatedRoute>
+                                    <ViewWorkItemComponent/>
+                                </AuthenticatedRoute>
+                            }/>
+                            <Route path="/sprints" element={
+                                <AuthenticatedRoute>
+                                    <SprintComponent/>
+                                </AuthenticatedRoute>
+                            }/>
+                            <Route path="/createSprint" element={
+                                <AuthenticatedRoute>
+                                    <CreateSprintComponent/>
+                                </AuthenticatedRoute>
+                            }/>
+                            <Route path="/editSprint/:sprintId" element={
+                                <AuthenticatedRoute>
+                                    <EditSprintComponent/>
+                                </AuthenticatedRoute>
+                            }/>
+                            <Route path="/closeSprint" element={
+                                <AuthenticatedRoute>
+                                    <CloseSprintComponent/>
+                                </AuthenticatedRoute>
+                            }/>
+                            <Route path="/deleteSprint" element={
+                                <AuthenticatedRoute>
+                                    <DeleteSprintComponent/>
+                                </AuthenticatedRoute>
+                            }/>
+                        </Routes>
+                    </div>
+                </BrowserRouter>
+            </AuthProvider>
         </div>
     )
 }
