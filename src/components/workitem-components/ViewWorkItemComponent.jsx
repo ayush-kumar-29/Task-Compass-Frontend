@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Autocomplete, Button, CardContent, Grid, MenuItem, Select, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import { useNavigate, useParams } from 'react-router-dom';
 import { callRetrieveUserNamesApi } from '../../api/UserApiService';
 import { callRetrieveSprintNamesApi } from '../../api/SprintApiService';
 import { callDeleteWorkItemApi, callRetrieveWorkItemForIdApi, callUpdateWorkItemApi } from '../../api/WorkItemApiService';
+import { AuthContext } from '../../auth/AuthContext';
 // import { makeStyles } from '@mui/styles';
 
 const cardStyle = ()=>({
@@ -22,6 +23,8 @@ const cardPosition = {
 export default function ViewWorkItemComponent(){
     const statusList=["NEW", "ONGOING", "CLOSED"]
     const priorityList=["HIGH", "MEDIUM", "LOW"]
+
+    const authContext = useContext(AuthContext)
 
     const navigate = useNavigate()
 
@@ -144,7 +147,8 @@ export default function ViewWorkItemComponent(){
             {
                 updateType: "content",
                 newStatus: status
-            }
+            },
+            authContext.token
         )
         .then((resp) => {
             navigate("/workItems")
@@ -202,7 +206,7 @@ export default function ViewWorkItemComponent(){
     }
 
     function deleteWorkItem(){
-        callDeleteWorkItemApi(params.workItemId)
+        callDeleteWorkItemApi(params.workItemId, authContext.token)
         .then((resp) => {
             navigate("/workItems")
         })
@@ -212,19 +216,19 @@ export default function ViewWorkItemComponent(){
     
     useEffect(() => {
         if(!initialValuesFetched){
-            callRetrieveUserNamesApi()
+            callRetrieveUserNamesApi(authContext.token)
             .then((resp) => {
                 setAssigneeList(resp.data)
             })
             .catch((error) => console.log(error))
 
-            callRetrieveSprintNamesApi()
+            callRetrieveSprintNamesApi(authContext.token)
             .then((resp) => {
                 updateSprintList(resp.data)
             })
             .catch((error) => console.log(error))
 
-            callRetrieveWorkItemForIdApi(params.workItemId)
+            callRetrieveWorkItemForIdApi(params.workItemId, authContext.token)
             .then((resp) => {
                 console.log(resp)
                 updateTitle(resp.data.workItemTitle)

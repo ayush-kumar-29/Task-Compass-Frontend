@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { Button, CardContent, Checkbox, FormControlLabel, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import {Grid} from '@mui/material';
 import {useNavigate} from "react-router-dom"
 import { callDeleteTodoApi, callUpdateTodoStatusApi } from '../../api/TodoApiService';
+import { AuthContext } from '../../auth/AuthContext';
 
 const cardStyle = ()=>({
     width: 1200,
@@ -16,11 +17,16 @@ const cardPosition = {
     marginTop:30,
 }
 
-export default function TodoItemComponent({todoId, todoDesc, dueDate, status}){
+export default function TodoItemComponent({todoId, todoDesc, dueDate, status, updateOnFiltersChanged}){
     const navigate = useNavigate()
+    const authContext = useContext(AuthContext)
 
     function markTodoAsDone(){
-        callUpdateTodoStatusApi(todoId, {userName: "user1", updateType: "status"})
+        callUpdateTodoStatusApi(todoId, {userName: authContext.loggedInUserName, updateType: "status"}, authContext.token)
+        .then((resp) => {
+            updateOnFiltersChanged(true)
+        })
+        .catch((error) => console.log(error))
     }
 
     function updateTodo(){
@@ -29,7 +35,11 @@ export default function TodoItemComponent({todoId, todoDesc, dueDate, status}){
 
     function deleteTodo(){
         // TODO: CHANGE USER NAME
-        callDeleteTodoApi(todoId, {userName: "user1"})
+        callDeleteTodoApi(todoId, {userName: authContext.loggedInUserName}, authContext.token)
+        .then((resp) => {
+            updateOnFiltersChanged(true)
+        })
+        .catch((error) => console.log(error))
     }
     return(
         <div style={cardPosition}>

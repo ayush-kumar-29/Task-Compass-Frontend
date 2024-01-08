@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Avatar, Box, Button, CardContent, CardMedia, CircularProgress, Grid, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import todo_image from "../../assets/todo-image.png"
 import { useNavigate } from 'react-router-dom';
 import { callRetrievTodosCountApi } from '../../api/TodoApiService';
+import { AuthContext } from '../../auth/AuthContext';
 
 const cardStyle = ()=>({
     width: 200,
@@ -23,6 +24,7 @@ const imageStyle={
 }
 
 export default function TodoCardComponent(props){
+    const authContext = useContext(AuthContext)
     const navigate = useNavigate()
 
     const [todoCount, updateTodoCount] = useState(0)
@@ -33,7 +35,7 @@ export default function TodoCardComponent(props){
 
     useEffect(() => {
         // TODO: CHANGE USER NAME
-        callRetrievTodosCountApi({userName: "user1", status:"OPEN"})
+        callRetrievTodosCountApi({userName: authContext.loggedInUserName, status:"OPEN"}, authContext.token)
         .then((resp) => {
             updateTodoCount(resp.data)
         })

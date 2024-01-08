@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Button, CardContent, Grid, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import { useNavigate } from 'react-router-dom';
 import { callAddTodoApi } from '../../api/TodoApiService';
+import { AuthContext } from '../../auth/AuthContext';
 // import { makeStyles } from '@mui/styles';
 
 const cardStyle = ()=>({
@@ -18,6 +19,7 @@ const cardPosition = {
 }
 
 export default function AddTodoComponent(){
+    const authContext = useContext(AuthContext)
     const [desc, updateDesc] = useState()
     const [descError, setDescError] = useState(false)
     const [descHelperText, setDescHelperText] = useState()
@@ -65,7 +67,7 @@ export default function AddTodoComponent(){
 
     function addTodo(){
         // TODO: CHANGE USER NAME
-        callAddTodoApi({todoDescription:desc, dueDate}, {userName:"user1"})
+        callAddTodoApi({todoDescription:desc, dueDate}, {userName:authContext.loggedInUserName}, authContext.token)
         .then((resp) => {
             console.log(resp)
             navigate("/todos")

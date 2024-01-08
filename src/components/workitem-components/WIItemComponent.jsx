@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Autocomplete, Button, CardContent, Checkbox, Chip, FormControlLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import {Grid} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { callUpdateWorkItemStatusApi } from '../../api/WorkItemApiService';
+import { AuthContext } from '../../auth/AuthContext';
 
 const cardStyle = ()=>({
     width: 1200,
@@ -25,6 +26,8 @@ export default function WIItemComponent({workItemId, workItemTitle, dueDate, sta
     const [workItemStatusChangedFlag, updateWorkItemStatusChangedFlag]  = useState(false)
 
     const navigate = useNavigate()
+
+    const authContext = useContext(AuthContext)
     
     function workItemStatusChanged(event){
         updateWorkItemStatus(event.target.value)
@@ -37,7 +40,11 @@ export default function WIItemComponent({workItemId, workItemTitle, dueDate, sta
 
     useEffect(() =>{
         if(workItemStatusChangedFlag){
-            callUpdateWorkItemStatusApi(workItemId, {updateType:"status", newStatus:workItemStatus.replace(" ", "%20")})
+            callUpdateWorkItemStatusApi(
+                workItemId, 
+                {updateType:"status", newStatus:workItemStatus.replace(" ", "%20")}, 
+                authContext.token
+            )
             .then((resp) => {
                 console.log(resp)
             })

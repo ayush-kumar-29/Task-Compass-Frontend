@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Autocomplete, Button, CardContent, Checkbox, Chip, FormControlLabel, MenuItem, Select, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import {Grid} from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { callUpdateIssueStatusApi } from '../../api/IssueApiService';
+import { AuthContext } from '../../auth/AuthContext';
 
 const cardStyle = ()=>({
     width: 1200,
@@ -16,13 +17,15 @@ const cardPosition = {
     marginTop:30,
 }
 
-export default function IssueItemComponent({issueId, issueTitle, severity, creatorName, status, onIssueStatusChanged}){
+export default function IssueItemComponent({issueId, issueTitle, severity, creatorName, assigneeName, status, onIssueStatusChanged}){
+    const authContext = useContext(AuthContext)
     const statusList=["NEW", "IN PROGRESS", "RESOLVED"]
 
     const navigate = useNavigate()
 
     const [issueStatus, updateIssueStatus]  = useState(status)
     const [issueStatusChangedFlag, updateIssueStatusChangedFlag]  = useState(false)
+    const [canEditIssue, updateCanEditIssue] = useState(assigneeName===authContext.loggedInUserName)
 
     function issueStatusChanged(event){
         updateIssueStatus(event.target.value)
@@ -31,13 +34,14 @@ export default function IssueItemComponent({issueId, issueTitle, severity, creat
 
     useEffect(() =>{
         if(issueStatusChangedFlag){
-            callUpdateIssueStatusApi(issueId, {updateType:"status", newStatus:issueStatus.replace(" ", "%20")})
+            callUpdateIssueStatusApi(issueId, {updateType:"status", newStatus:issueStatus.replace(" ", "%20")}, authContext.token)
             .then((resp) => {
                 console.log(resp)
+                onIssueStatusChanged()
             })
             .catch((error) => console.log(error))
             updateIssueStatusChangedFlag(false)
-            onIssueStatusChanged()
+            // onIssueStatusChanged()
         }
     })
 
@@ -88,7 +92,7 @@ export default function IssueItemComponent({issueId, issueTitle, severity, creat
                             <TextField
                                 select={true}
                                 label="Status"
-                                // disabled={true}
+                                disabled={!canEditIssue}
                                 value={issueStatus}
                                 onChange={issueStatusChanged}
                                 fullWidth={true}

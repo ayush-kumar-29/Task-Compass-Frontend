@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, CardContent, Checkbox, FormControlLabel, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import {Grid} from '@mui/material';
 import { callRetrieveOngoingWorkItemCountApi, callRetrieveWorkItemCountApi } from '../../api/WorkItemApiService';
 import { callDeleteSprintApi, callUpdateSprintStatusApi } from '../../api/SprintApiService';
 import { useNavigate } from 'react-router-dom';
+import { AuthContext } from '../../auth/AuthContext';
 
 const cardStyle = ()=>({
     width: 1200,
@@ -19,6 +20,7 @@ const cardPosition = {
 
 export default function SprintItemComponent({ sprintId, sprintName, sprintStartDate, sprintEndDate, status, 
     onSprintStatusChanged, onDeleteSprintInvoked, onCloseSprintInvoked}){
+    const authContext = useContext(AuthContext)
     const navigate = useNavigate()
     
     const [ongoingWorkItemCount, updateOngoingWorkItemCount] = useState()
@@ -48,7 +50,7 @@ export default function SprintItemComponent({ sprintId, sprintName, sprintStartD
     useEffect(() =>{
         if(!initialValuesFetched){
             // TODO: CHANGE USER NAME
-            callRetrieveWorkItemCountApi({userName:"user1", sprintId:null, status:"ONGOING"})
+            callRetrieveWorkItemCountApi({userName:authContext.loggedInUserName, sprintId:sprintId, status:"ONGOING"}, authContext.token)
             .then((resp) => {
                 updateOngoingWorkItemCount(resp.data)
             })
@@ -67,7 +69,7 @@ export default function SprintItemComponent({ sprintId, sprintName, sprintStartD
             }
         }
         if(sprintStatusChangedFlag){
-            callUpdateSprintStatusApi(sprintId, {updateType:"status", newStatus:nextSprintStatus})
+            callUpdateSprintStatusApi(sprintId, {updateType:"status", newStatus:nextSprintStatus}, authContext.token)
             .then((resp) => {
                 console.log(resp)
                 onSprintStatusChanged()

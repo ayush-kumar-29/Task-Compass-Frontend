@@ -32,6 +32,8 @@ export default function LoginComponent(){
 
     const authContext = useContext(AuthContext)
 
+    console.log(authContext)
+
     const navigate = useNavigate()
 
     function userNameChanged(event){

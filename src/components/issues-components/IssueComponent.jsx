@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Autocomplete, Button, ButtonGroup, CardContent, FormControlLabel, FormGroup, Paper, Radio, RadioGroup, Switch, TextField } from '@mui/material';
 import Card from '@mui/material/Card';
 import {Grid} from '@mui/material';
@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import IssueItemComponent from './IssueItemComponent';
 import { callRetrieveUserNamesApi } from '../../api/UserApiService';
 import { callRetrieveIssuesForFilterApi } from '../../api/IssueApiService';
+import { AuthContext } from '../../auth/AuthContext';
 
 const gridPosition = {
     display: 'flex',
@@ -17,6 +18,7 @@ const gridPosition = {
 }
 
 export default function IssueComponent(){
+    const authContext = useContext(AuthContext)
     const navigate = useNavigate()
     const [userNames, setUserNames] = useState([])
     const [newFilter, updateNewFilterStatus] = useState(false)
@@ -25,7 +27,7 @@ export default function IssueComponent(){
     const [filterModified, setfilterModified] = useState(true)
     const [issueStatusChanged, setIssueStatusChanged] = useState(false)
     // TODO: CHANGE USER NAME
-    const [assigneeFilter, setAssigneeFilter] = useState("user1")
+    const [assigneeFilter, setAssigneeFilter] = useState(authContext.loggedInUserName)
     const [issuesList, setIssuesList] = useState([])
 
     const newFilterChanged =(event) => {
@@ -43,13 +45,13 @@ export default function IssueComponent(){
 
     useEffect(() => {
         if(filterModified || issueStatusChanged){
-            callRetrieveUserNamesApi()
+            callRetrieveUserNamesApi(authContext.token)
             .then((resp) => {
                 setUserNames(resp.data)
             })
             .catch((error) => console.log(error))
 
-            callRetrieveIssuesForFilterApi(assigneeFilter, newFilter, inProgressFilter, resolvedFilter)
+            callRetrieveIssuesForFilterApi(assigneeFilter, newFilter, inProgressFilter, resolvedFilter, authContext.token)
             .then((resp) => {
                 // console.log(resp.data)
                 setIssuesList(resp.data)
@@ -161,6 +163,7 @@ export default function IssueComponent(){
                                                 issueTitle={issue.issueTitle}
                                                 severity={issue.severity}
                                                 creatorName={issue.creatorName}
+                                                assigneeName={issue.assigneeName}
                                                 status={issue.status}
                                                 onIssueStatusChanged={onIssueStatusChanged}
                                             />

@@ -1,34 +1,46 @@
 import {apiClient} from "./ApiClient"
 
-export function callRetrieveIssuesForFilterApi(assigneeFilter, newFilter, inProgressFilter, resolvedFilter){
-    return apiClient.get("/issues", {params: {assignee:assigneeFilter, newIssue:newFilter, 
-        inProgress:inProgressFilter, resolved:resolvedFilter}})
+export function callRetrieveIssuesForFilterApi(assigneeFilter, newFilter, inProgressFilter, resolvedFilter, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.get(
+        "/issues", 
+        {
+            headers, 
+            params: {assignee:assigneeFilter, newIssue:newFilter, inProgress:inProgressFilter, resolved:resolvedFilter}
+        }
+    )
 }
 
-export function callRetrieveIssueCountApi(queryParams){
-    return apiClient.get("/issues/countByType", {params: queryParams})
-}
-
-export function callAddIssueApi(issue){
-    return apiClient.post("issues/addIssue", issue)
-}
-
-export function callUpdateIssueStatusApi(id, queryParams){
+export function callRetrieveIssueCountApi(queryParams, authToken){
+    const headers = {'Authorization': authToken}
     console.log(queryParams)
-    return apiClient.patch(`/issues/editIssue/${id}`, {}, {params: queryParams})
+    return apiClient.get("/issues/countByType", {headers, params: queryParams})
 }
 
-export function callUpdateIssueApi(id, issue, queryParams){
-    return apiClient.patch(`/issues/editIssue/${id}`, issue, {params: queryParams})
+export function callAddIssueApi(issue, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.post("issues/addIssue", issue, {headers})
+}
+
+export function callUpdateIssueStatusApi(id, queryParams, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.patch(`/issues/editIssue/${id}`, {}, {headers, params: queryParams})
+}
+
+export function callUpdateIssueApi(id, issue, queryParams, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.patch(`/issues/editIssue/${id}`, issue, {headers, params: queryParams})
 }
 
 
-export function callRetrieveIssueForIdApi(issueId){
-    return apiClient.get(`/issues/${issueId}`)
+export function callRetrieveIssueForIdApi(issueId, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.get(`/issues/${issueId}`, {headers})
 }
 
-export function callDeleteIssueApi(id){   
-    return apiClient.delete(`/issues/deleteIssue/${id}`)
+export function callDeleteIssueApi(id, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.delete(`/issues/deleteIssue/${id}`, {headers})
 }
 
 // export function callRetrieveTodoForIdApi(todoId, queryParams){

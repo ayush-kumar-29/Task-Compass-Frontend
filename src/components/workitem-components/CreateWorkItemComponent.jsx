@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Autocomplete, Button, CardContent, Grid, MenuItem, Select, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import { useNavigate } from 'react-router-dom';
 import { callRetrieveSprintNamesApi } from '../../api/SprintApiService';
 import { callRetrieveUserNamesApi } from '../../api/UserApiService';
 import { callAddWorkItemApi } from '../../api/WorkItemApiService';
+import { AuthContext } from '../../auth/AuthContext';
 // import { makeStyles } from '@mui/styles';
 
 const cardStyle = ()=>({
@@ -20,6 +21,7 @@ const cardPosition = {
 }
 
 export default function CreateWorkItemComponent(){
+    const authContext = useContext(AuthContext)
     const navigate = useNavigate()
 
     const [title, updateTitle] = useState()
@@ -54,13 +56,13 @@ export default function CreateWorkItemComponent(){
 
     useEffect(() => {
         if(!initialValuesFetched){
-            callRetrieveSprintNamesApi()
+            callRetrieveSprintNamesApi(authContext.token)
             .then((resp) => {
                 updateSprintList(resp.data)
             })
             .catch((error) => console.log(error))
 
-            callRetrieveUserNamesApi()
+            callRetrieveUserNamesApi(authContext.token)
             .then((resp) => {
                 updateAssigneeList(resp.data)
             })
@@ -151,8 +153,9 @@ export default function CreateWorkItemComponent(){
                 assigneeName: assignee,
                 status: "NEW",
                 // TODO: CHANGE USER NAME
-                creatorName: "user1"
-            }
+                creatorName: authContext.loggedInUserName
+            },
+            authContext.token
         )
         .then((resp) => {
             navigate("/workItems")

@@ -1,30 +1,37 @@
 import {apiClient} from "./ApiClient"
 
-export function callRetrieveTodoForFilterApi(queryParams){
-    return apiClient.get("/todos", {params: queryParams})
+export function callRetrieveTodoForFilterApi(queryParams, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.get("/todos", {headers, params: queryParams})
 }
 
-export function callRetrieveTodoForIdApi(todoId, queryParams){
-    return apiClient.get(`/todos/${todoId}`, {params: queryParams})
+export function callRetrieveTodoForIdApi(todoId, queryParams, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.get(`/todos/${todoId}`, {headers, params: queryParams})
 }
 
-export function callRetrievTodosCountApi(queryParams){
-    return apiClient.get("/todos/countByType", {params: queryParams})
+export function callRetrievTodosCountApi(queryParams, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.get("/todos/countByType", {headers, params: queryParams})
 }
 
-export function callAddTodoApi(todo, queryParams){
-    return apiClient.post("todos/addTodo", todo, {params: queryParams})
+export function callAddTodoApi(todo, queryParams, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.post("todos/addTodo", todo, {headers, params: queryParams})
 }
 
-export function callDeleteTodoApi(id, queryParams){   
-    return apiClient.delete(`/todos/deleteTodo/${id}`, {params: queryParams})
+export function callDeleteTodoApi(id, queryParams, authToken){
+    const headers = {'Authorization': authToken} 
+    return apiClient.delete(`/todos/deleteTodo/${id}`, {headers, params: queryParams})
 }
 
-export function callUpdateTodoStatusApi(id, queryParams){   
-    return apiClient.patch(`/todos/updateTodo/${id}`, {}, {params: queryParams})
+export function callUpdateTodoStatusApi(id, queryParams, authToken){   
+    const headers = {'Authorization': authToken}
+    return apiClient.patch(`/todos/updateTodo/${id}`, {}, {headers, params: queryParams})
 }
 
-export function callUpdateTodoApi(id, queryParams, todo){
-    return apiClient.patch(`/todos/updateTodo/${id}`, todo, {params: queryParams})
+export function callUpdateTodoApi(id, queryParams, todo, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.patch(`/todos/updateTodo/${id}`, todo, {headers, params: queryParams})
 }
 

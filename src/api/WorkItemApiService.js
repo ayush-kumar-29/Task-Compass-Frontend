@@ -1,8 +1,10 @@
 import {apiClient} from "./ApiClient"
 
-export function callRetrieveWorkItemsForFilterApi(sprintFilter, assigneeFilter, newFilter, ongoingFilter, completedFilter){
+export function callRetrieveWorkItemsForFilterApi(sprintFilter, assigneeFilter, newFilter, ongoingFilter, completedFilter, authToken){
+    const headers = {'Authorization': authToken}
     return apiClient.get("/workItems", 
         {
+            headers,
             params: {
                 sprintName: sprintFilter,
                 assignee:assigneeFilter, 
@@ -14,29 +16,34 @@ export function callRetrieveWorkItemsForFilterApi(sprintFilter, assigneeFilter, 
     )
 }
 
-export function callAddWorkItemApi(workItem){
-    return apiClient.post("workItems/addWorkItem", workItem)
+export function callAddWorkItemApi(workItem, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.post("workItems/addWorkItem", workItem, {headers})
 }
 
-export function callUpdateWorkItemStatusApi(id, queryParams){
-    console.log(queryParams)
-    return apiClient.patch(`/workItems/editWorkItem/${id}`, {}, {params: queryParams})
+export function callUpdateWorkItemStatusApi(workItemId, queryParams, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.patch(`/workItems/editWorkItem/${workItemId}`, {}, {headers, params: queryParams})
 }
 
-export function callUpdateWorkItemApi(id, workItem, queryParams){
-    return apiClient.patch(`/workItems/editWorkItem/${id}`, workItem, {params: queryParams})
+export function callUpdateWorkItemApi(workItemId, workItem, queryParams, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.patch(`/workItems/editWorkItem/${workItemId}`, workItem, {headers, params: queryParams})
 }
 
-export function callRetrieveWorkItemForIdApi(workItemId){
-    return apiClient.get(`/workItems/${workItemId}`)
+export function callRetrieveWorkItemForIdApi(workItemId, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.get(`/workItems/${workItemId}`, {headers})
 }
 
-export function callDeleteWorkItemApi(id){   
-    return apiClient.delete(`/workItems/deleteWorkItem/${id}`)
+export function callDeleteWorkItemApi(workItemId, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.delete(`/workItems/deleteWorkItem/${workItemId}`, {headers})
 }
 
-export function callRetrieveWorkItemCountApi(queryParams){
-    return apiClient.get("/workItems/countByType", {params: queryParams})
+export function callRetrieveWorkItemCountApi(queryParams, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.get("/workItems/countByType", {headers, params: queryParams})
 }
 
 

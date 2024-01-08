@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Autocomplete, Button, CardContent, Grid, MenuItem, Select, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import { useNavigate } from 'react-router-dom';
 import { callRetrieveUserNamesApi, callValidateUserNamesApi } from '../../api/UserApiService';
 import { callAddIssueApi } from '../../api/IssueApiService';
+import { AuthContext } from '../../auth/AuthContext';
 // import { makeStyles } from '@mui/styles';
 
 const cardStyle = ()=>({
@@ -22,6 +23,7 @@ export default function CreateIssueComponent(){
     // const assigneeList=["User-1", "User-2", "User-3"]
     const priority=["HIGH", "MEDIUM", "LOW"]
     const navigate = useNavigate()
+    const authContext = useContext(AuthContext)
 
     const [title, updateTitle] = useState()
     const [titleError, setTitleError] = useState(false)
@@ -111,7 +113,7 @@ export default function CreateIssueComponent(){
 
     useEffect(() => {
         if(!userListFetched){
-            callRetrieveUserNamesApi()
+            callRetrieveUserNamesApi(authContext.token)
             .then((resp) => {
                 setAssigneeList(resp.data)
             })
@@ -130,8 +132,9 @@ export default function CreateIssueComponent(){
                 severity: severity,
                 assigneeName: assignee,
                 // TODO: CHANGE USER NAME
-                creatorName: "user1"
-            }
+                creatorName: authContext.loggedInUserName
+            }, 
+            authContext.token
         )
         .then((resp) => {
             navigate("/issues")

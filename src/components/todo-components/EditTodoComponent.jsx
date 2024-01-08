@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, CardContent, Grid, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import { useNavigate, useParams } from 'react-router-dom';
 import { callRetrieveTodoForIdApi, callUpdateTodoApi } from '../../api/TodoApiService';
+import { AuthContext } from '../../auth/AuthContext';
 // import { makeStyles } from '@mui/styles';
 
 const cardStyle = ()=>({
@@ -30,11 +31,13 @@ export default function EditTodoComponent(){
 
     const navigate = useNavigate()
 
+    const authContext = useContext(AuthContext)
+
     useEffect(() => {
         // console.log(params)
         // TODO: CHANGE USERNAME
         if(!initialValueFetched){
-            callRetrieveTodoForIdApi(params.todoId, {userName:"user1"})
+            callRetrieveTodoForIdApi(params.todoId, {userName:authContext.loggedInUserName}, authContext.token)
             .then((resp) => {
                 setTodoDesc(resp.data.todoDescription)
                 setDueDate(resp.data.dueDate)
@@ -73,7 +76,12 @@ export default function EditTodoComponent(){
 
     function addTodo(){
         // TODO: CHANGE USER NAME
-        callUpdateTodoApi(params.todoId, {userName:"user1", updateType:"content"}, {todoDescription:todoDesc, dueDate})
+        callUpdateTodoApi(
+            params.todoId, 
+            {userName:authContext.loggedInUserName, updateType:"content"}, 
+            {todoDescription:todoDesc, dueDate},
+            authContext.token
+        )
         .then((resp) => {
             console.log(resp)
             navigate("/todos")

@@ -1,37 +1,50 @@
 import {apiClient} from "./ApiClient"
 
-export function callRetrieveSprintNamesApi(){
-    return apiClient.get("/listSprints")
+export function callRetrieveSprintNamesApi(authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.get("/listSprints", {headers})
 }
 
-export function callRetrieveSprintsForFilterApi(upcomingFilter, ongoingFilter, closedFilter){
-    return apiClient.get("/sprints", {params: {upcomingFilter:upcomingFilter, ongoingFilter:ongoingFilter, closedFilter:closedFilter}})
+export function callRetrieveSprintsForFilterApi(upcomingFilter, ongoingFilter, closedFilter, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.get(
+        "/sprints", 
+        {
+            headers, 
+            params: {upcomingFilter:upcomingFilter, ongoingFilter:ongoingFilter, closedFilter:closedFilter}
+        }
+    )
 }
 
-export function callAddSprintApi(issue){
-    return apiClient.post("/sprints/createSprint", issue)
+export function callAddSprintApi(issue, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.post("/sprints/createSprint", issue, {headers})
 }
 
-export function callUpdateSprintStatusApi(sprintId, queryParams){
-    console.log(queryParams)
-    return apiClient.patch(`/sprints/updateSprint/${sprintId}`, {}, {params: queryParams})
+export function callUpdateSprintStatusApi(sprintId, queryParams, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.patch(`/sprints/updateSprint/${sprintId}`, {}, {headers, params: queryParams})
 }
 
-export function callUpdateSprintContentApi(sprintId, sprint, queryParams){
-    return apiClient.patch(`/issues/editIssue/${sprintId}`, sprint, {params: queryParams})
+export function callUpdateSprintContentApi(sprintId, sprint, queryParams, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.patch(`/sprints/updateSprint/${sprintId}`, sprint, {headers, params: queryParams})
 }
 
 
-export function callRetrieveSprintForIdApi(sprintId){
-    return apiClient.get(`/sprints/${sprintId}`)
+export function callRetrieveSprintForIdApi(sprintId, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.get(`/sprints/${sprintId}`, {headers})
 }
 
-export function callDeleteSprintApi(sprintId){
-    return apiClient.delete(`/sprints/deleteSprint/${sprintId}`)
+export function callDeleteSprintApi(sprintId, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.delete(`/sprints/deleteSprint/${sprintId}`, {headers})
 }
 
-export function callValidateSprintNameApi(sprintName){
-    return apiClient.get("/sprints/exists", {params: {sprintName}})
+export function callValidateSprintNameApi(sprintName, authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.get("/sprints/exists", {headers, params: {sprintName}})
 }
 
 // export function callRetrieveTodoForIdApi(todoId, queryParams){

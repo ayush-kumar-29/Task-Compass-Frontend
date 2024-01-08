@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, CardContent, Grid, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import issue_image from "../../assets/issue-image.png"
 import { useNavigate } from 'react-router-dom';
 import { callRetrieveIssueCountApi } from '../../api/IssueApiService';
+import { AuthContext } from '../../auth/AuthContext';
 
 const cardStyle = ()=>({
     width: 200,
@@ -25,6 +26,7 @@ const imageStyle={
 }
 
 export default function IssueCardComponent(){
+    const authContext = useContext(AuthContext)
     const navigate = useNavigate()
 
     const [issueCount, updateIssueCount] = useState(0)
@@ -36,14 +38,14 @@ export default function IssueCardComponent(){
     useEffect(() => {
         // TODO: CHANGE USER NAME
         var count=0
-        callRetrieveIssueCountApi({userName:"user1", status:"NEW"})
+        callRetrieveIssueCountApi({userName:authContext.loggedInUserName, status:"NEW"}, authContext.token)
         .then((resp) => {
             count+=resp.data
         })
         .catch((error) => console.log(error))
 
         // TODO: CHANGE USER NAME
-        callRetrieveIssueCountApi({userName:"user1", status:"IN%20PROGRESS"})
+        callRetrieveIssueCountApi({userName:authContext.loggedInUserName, status:"IN%20PROGRESS"}, authContext.token)
         .then((resp) => {
             count+=resp.data
             updateIssueCount(count)

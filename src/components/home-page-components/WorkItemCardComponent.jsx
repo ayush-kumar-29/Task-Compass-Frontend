@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, CardContent, Grid, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import task_image from "../../assets/task-image.png"
 import { useNavigate } from 'react-router-dom';
 import { callRetrieveWorkItemCountApi } from '../../api/WorkItemApiService';
+import { AuthContext } from '../../auth/AuthContext';
 
 const cardStyle = ()=>({
     width: 200,
@@ -24,6 +25,7 @@ const imageStyle={
 
 export default function WorkItemCardComponent(){
     const navigate = useNavigate()
+    const authContext = useContext(AuthContext)
 
     const [workItemCount, updateWorkItemCount] = useState(0)
 
@@ -34,14 +36,14 @@ export default function WorkItemCardComponent(){
     useEffect(() => {
         var count=0
         // TODO: CHANGE USER NAME
-        callRetrieveWorkItemCountApi({userName:"user1", sprintId:-1, status:"NEW"})
+        callRetrieveWorkItemCountApi({userName:authContext.loggedInUserName, sprintId:-1, status:"NEW"}, authContext.token)
         .then((resp) => {
             count+=resp.data
         })
         .catch((error) => console.log(error))
         
         // TODO: CHANGE USER NAME
-        callRetrieveWorkItemCountApi({userName:"user1", sprintId:-1, status:"ONGOING"})
+        callRetrieveWorkItemCountApi({userName:authContext.loggedInUserName, sprintId:-1, status:"ONGOING"}, authContext.token)
         .then((resp) => {
             count+=resp.data
             updateWorkItemCount(count)

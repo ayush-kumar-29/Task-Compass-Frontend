@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, ButtonGroup, CardContent, FormControlLabel, FormGroup, Paper, Radio, RadioGroup, Switch } from '@mui/material';
 import Card from '@mui/material/Card';
 import {Grid} from '@mui/material';
 import TodoItemComponent from './TodoItemComponent';
 import { useNavigate } from 'react-router-dom';
 import { callRetrieveTodoForFilterApi } from '../../api/TodoApiService';
+import { AuthContext } from '../../auth/AuthContext';
 
 const gridPosition = {
     display: 'flex',
@@ -21,6 +22,7 @@ export default function TodoComponent(){
     const [completedFilter, updateCompletedFilterStatus] = useState(false)
     const [onFiltersChanged, updateOnFiltersChanged] = useState(true)
     const [todosList, updateTodosList] = useState([])
+    const authContext = useContext(AuthContext)
 
     const openFilterChanged =(event) => {
         updateOpenFilterStatus(event.target.checked)
@@ -38,7 +40,10 @@ export default function TodoComponent(){
     useEffect(() => {
         // TODO: CHANGE USERNAME
         if(onFiltersChanged){
-            callRetrieveTodoForFilterApi({userName:"user1", open:openFilter, completed:completedFilter})
+            callRetrieveTodoForFilterApi(
+                {userName:authContext.loggedInUserName, open:openFilter, completed:completedFilter}, 
+                authContext.token
+            )
             .then((resp) => {
                 updateTodosList(resp.data)
             })
@@ -105,6 +110,7 @@ export default function TodoComponent(){
                                                 todoDesc={todo.todoDescription} 
                                                 dueDate={todo.dueDate}
                                                 status={todo.isDone}
+                                                updateOnFiltersChanged={updateOnFiltersChanged}
                                             />
                                         </Grid>
                                     )

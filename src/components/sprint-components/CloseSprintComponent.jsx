@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, CardContent, Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Grid, Link, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import { useNavigate } from 'react-router-dom';
 import { callRetrieveWorkItemCountApi } from '../../api/WorkItemApiService';
 import { callUpdateSprintStatusApi } from '../../api/SprintApiService';
+import { AuthContext } from '../../auth/AuthContext';
 // import { makeStyles } from '@mui/styles';
 
 const cardStyle = ()=>({
@@ -19,6 +20,7 @@ const cardPosition = {
 }
 
 export default function CloseSprintComponent({openFlag, setOpenFlag, onSprintStatusChanged, sprintName, sprintId}){
+    const authContext = useContext(AuthContext)
     const [initialValuesFetched, updateInitialValuesFetched] = useState(false)
     const [newWorkItemCount, updateNewWorkItemCount] = useState()
     const [ongoingWorkItemCount, updateOngoingWorkItemCount] = useState()
@@ -26,7 +28,7 @@ export default function CloseSprintComponent({openFlag, setOpenFlag, onSprintSta
     const navigate = useNavigate()
 
     function closeSprint(){
-        callUpdateSprintStatusApi(sprintId, {updateType:"status", newStatus:"CLOSED"})
+        callUpdateSprintStatusApi(sprintId, {updateType:"status", newStatus:"CLOSED"}, authContext.token)
         .then((resp) => {
             setOpenFlag(false)
             onSprintStatusChanged()
@@ -37,14 +39,14 @@ export default function CloseSprintComponent({openFlag, setOpenFlag, onSprintSta
     useEffect(() =>{
         if(!initialValuesFetched){
             // TODO: CHANGE USER NAME
-            callRetrieveWorkItemCountApi({userName:"user1", sprintId:null, status:"NEW"})
+            callRetrieveWorkItemCountApi({userName:authContext.loggedInUserName, sprintId:sprintId, status:"NEW"}, authContext.token)
             .then((resp) => {
                 updateNewWorkItemCount(resp.data)
             })
             .catch((error) => console.log(error))
 
             // TODO: CHANGE USER NAME
-            callRetrieveWorkItemCountApi({userName:"user1", sprintId:null, status:"ONGOING"})
+            callRetrieveWorkItemCountApi({userName:authContext.loggedInUserName, sprintId:sprintId, status:"ONGOING"}, authContext.token)
             .then((resp) => {
                 updateOngoingWorkItemCount(resp.data)
             })

@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, CardContent, Grid, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import { useNavigate } from 'react-router-dom';
 import { callAddSprintApi, callValidateSprintNameApi } from '../../api/SprintApiService';
+import { AuthContext } from '../../auth/AuthContext';
 // import { makeStyles } from '@mui/styles';
 
 const cardStyle = ()=>({
@@ -18,6 +19,7 @@ const cardPosition = {
 }
 
 export default function CreateSprintComponent(){
+    const authContext = useContext(AuthContext)
     const navigate = useNavigate()
 
     const [sprint, updateSprint] = useState()
@@ -106,7 +108,8 @@ export default function CreateSprintComponent(){
                 sprintName: sprint,
                 sprintStartDate: startDate,
                 sprintEndDate: endDate, 
-            }
+            },
+            authContext.token
         )
         .then((resp) => {
             navigate("/sprints")
@@ -115,7 +118,7 @@ export default function CreateSprintComponent(){
     }
 
     useEffect(() =>{
-        callValidateSprintNameApi(sprint)
+        callValidateSprintNameApi(sprint, authContext.token)
         .then((resp) => {
             if(resp.data)
                 updateSprintNameExists(true)

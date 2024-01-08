@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Autocomplete, Button, ButtonGroup, CardContent, FormControlLabel, FormGroup, Paper, Radio, RadioGroup, Switch, TextField } from '@mui/material';
 import Card from '@mui/material/Card';
 import {Grid} from '@mui/material';
@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { callRetrieveSprintNamesApi } from '../../api/SprintApiService';
 import { callRetrieveUserNamesApi } from '../../api/UserApiService';
 import { callRetrieveWorkItemsForFilterApi } from '../../api/WorkItemApiService';
+import { AuthContext } from '../../auth/AuthContext';
 
 const gridPosition = {
     display: 'flex',
@@ -19,6 +20,7 @@ const gridPosition = {
 
 export default function WorkItemComponent(){
     const navigate = useNavigate()
+    const authContext = useContext(AuthContext)
     
     const [sprintList, updateSprintList] = useState([])
     const [userNames, setUserNames] = useState([])
@@ -27,27 +29,33 @@ export default function WorkItemComponent(){
     const [newFilter, updateNewFilterStatus] = useState(false)
     const [ongoingFilter, updateOngoingFilterStatus] = useState(true)
     const [completedFilter, updateCompletedFilterStatus] = useState(false)
+    const [initialValuesFetched, updateInitialValuesFetched] = useState(false)
     // TODO: CHANGE SPRINT NAME
-    const [sprintFilter, setSprintFilter] = useState("Sprint-1")
+    const [sprintFilter, setSprintFilter] = useState("")
     // TODO: CHANGE USER NAME
-    const [assigneeFilter, setAssigneeFilter] = useState("user1")
+    const [assigneeFilter, setAssigneeFilter] = useState(authContext.loggedInUserName)
     const [workItemList, setWorkItemList] = useState([])
 
     useEffect(() => {
         if(filterModified || workItemStatusChanged){
-            callRetrieveSprintNamesApi()
-            .then((resp) => {
-                updateSprintList(resp.data)
-            })
-            .catch((error) => console.log(error))
+            if(!initialValuesFetched){
+                callRetrieveSprintNamesApi(authContext.token)
+                .then((resp) => {
+                    updateSprintList(resp.data)
+                    setSprintFilter(resp.data[0])
+                })
+                .catch((error) => console.log(error))
 
-            callRetrieveUserNamesApi()
-            .then((resp) => {
-                setUserNames(resp.data)
-            })
-            .catch((error) => console.log(error))
-
-            callRetrieveWorkItemsForFilterApi(sprintFilter, assigneeFilter, newFilter, ongoingFilter, completedFilter)
+                callRetrieveUserNamesApi(authContext.token)
+                .then((resp) => {
+                    setUserNames(resp.data)
+                })
+                .catch((error) => console.log(error))
+                updateInitialValuesFetched(true)
+            }
+            
+            callRetrieveWorkItemsForFilterApi(sprintFilter, assigneeFilter, newFilter, 
+                ongoingFilter, completedFilter, authContext.token)
             .then((resp) => {
                 setWorkItemList(resp.data)
             })

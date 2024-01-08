@@ -19,13 +19,15 @@ export default function AuthProvider({children}){
                 setAuthenticated(true)
                 setLoggedInUserName(username)
                 const bearerToken = "Bearer "+resp.data.token
+                // localStorage.setItem('authToken', bearerToken);
                 setToken(bearerToken)
-                apiClient.interceptors.request.use(
-                    (config)=>{
-                        config.headers.Authorization=bearerToken
-                        return config
-                    }
-                )
+                console.log(bearerToken)
+                // apiClient.interceptors.request.use(
+                //     (config)=>{
+                //         config.headers.Authorization=bearerToken
+                //         return config
+                //     }
+                // )
                 return true
             }
             else{
@@ -45,10 +47,12 @@ export default function AuthProvider({children}){
     
     async function deauthenticateUserCreds(){
         try{
-            const resp = await callLogoutUserApi()
+            const resp = await callLogoutUserApi(token)
             setAuthenticated(false)
                 setLoggedInUserName(null)
                 setToken(null)
+                // localStorage.removeItem('authToken');
+                // removeAuthorizationInterceptor()
                 return true
         }
         catch(error){
@@ -59,6 +63,16 @@ export default function AuthProvider({children}){
         }  
     }
 
+    function removeAuthorizationInterceptor(){
+        const interceptorId = apiClient.interceptors.request.use(
+            (config) => {
+                config.headers.Authorization = token;
+                return config;
+            }
+        );
+        apiClient.interceptors.request.eject(interceptorId);
+    }
+
     async function registerNewUser(username, password, emailId){
         try{
             const resp = await callRegisterUserApi(username, password, emailId)
@@ -67,13 +81,15 @@ export default function AuthProvider({children}){
                 setAuthenticated(true)
                 setLoggedInUserName(username)
                 const bearerToken = "Bearer "+resp.data.token
+                localStorage.setItem('authToken', bearerToken);
+                console.log(localStorage.getItem("authToken"))
                 setToken(bearerToken)
-                apiClient.interceptors.request.use(
-                    (config)=>{
-                        config.headers.Authorization=bearerToken
-                        return config
-                    }
-                )
+                // apiClient.interceptors.request.use(
+                //     (config)=>{
+                //         config.headers.Authorization=bearerToken
+                //         return config
+                //     }
+                // )
                 return true
             }
             else{

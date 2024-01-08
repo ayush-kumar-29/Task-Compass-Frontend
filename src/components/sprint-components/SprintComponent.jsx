@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, ButtonGroup, CardContent, Dialog, DialogTitle, FormControlLabel, FormGroup, Paper, Radio, RadioGroup, Switch } from '@mui/material';
 import Card from '@mui/material/Card';
 import {Grid} from '@mui/material';
@@ -7,6 +7,7 @@ import { useNavigate } from 'react-router-dom';
 import { callRetrieveSprintsForFilterApi } from '../../api/SprintApiService';
 import DeleteSprintComponent from './DeleteSprintComponent';
 import CloseSprintComponent from './CloseSprintComponent';
+import { AuthContext } from '../../auth/AuthContext';
 
 const gridPosition = {
     display: 'flex',
@@ -18,6 +19,7 @@ const gridPosition = {
 }
 
 export default function SprintComponent(){
+    const authContext = useContext(AuthContext)
     const navigate = useNavigate()
 
     const [filterModified, setfilterModified] = useState(true)
@@ -66,7 +68,7 @@ export default function SprintComponent(){
 
     useEffect(() => {
         if(filterModified || sprintStatusChanged){
-            callRetrieveSprintsForFilterApi(upcomingFilter, ongoingFilter, closedFilter)
+            callRetrieveSprintsForFilterApi(upcomingFilter, ongoingFilter, closedFilter, authContext.token)
             .then((resp) => {
                 setSprintList(resp.data)
             })
@@ -86,6 +88,7 @@ export default function SprintComponent(){
                     setOpenFlag={setShowDeleteSprintDialog} 
                     sprintName={sprintNameToUpdate}
                     sprintId={sprintIdToUpdate}
+                    setSprintStatusChanged={setSprintStatusChanged}
                 />
             }
             {

@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Autocomplete, Button, CardContent, Grid, MenuItem, Select, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import { callRetrieveUserNamesApi } from '../../api/UserApiService';
 import { useNavigate, useParams } from 'react-router-dom';
 import { callDeleteIssueApi, callRetrieveIssueForIdApi, callUpdateIssueApi } from '../../api/IssueApiService';
+import { AuthContext } from '../../auth/AuthContext';
 // import { makeStyles } from '@mui/styles';
 
 const cardStyle = ()=>({
@@ -19,6 +20,7 @@ const cardPosition = {
 }
 
 export default function ViewIssueComponent(){
+    const authContext = useContext(AuthContext)
     const statusList=["NEW", "IN PROGRESS", "RESOLVED"]
     const severityList=["LOW", "MEDIUM", "HIGH"]
 
@@ -56,6 +58,7 @@ export default function ViewIssueComponent(){
     const [creatorName, updateCreatorName] = useState('')
     const [creationDate, updateCreationDate] = useState('')
     const [initialValuesFetched, setInitialValuesFetched] = useState(false)
+    const [canEditIssue, updateCanEditIssue] = useState(false)
 
     function onTitleChanged(event){
         updateTitle(event.target.value)
@@ -162,7 +165,8 @@ export default function ViewIssueComponent(){
             {
                 updateType: "content",
                 newStatus: status
-            }
+            },
+            authContext.token
         )
         .then((resp) => {
             navigate("/issues")
@@ -173,7 +177,7 @@ export default function ViewIssueComponent(){
     }
 
     function deleteIssue(){
-        callDeleteIssueApi(params.issueId)
+        callDeleteIssueApi(params.issueId, authContext.token)
         .then((resp) => {
             navigate("/issues")
         })
@@ -182,13 +186,13 @@ export default function ViewIssueComponent(){
     
     useEffect(() => {
         if(!initialValuesFetched){
-            callRetrieveUserNamesApi()
+            callRetrieveUserNamesApi(authContext.token)
             .then((resp) => {
                 setAssigneeList(resp.data)
             })
             .catch((error) => console.log(error))
 
-            callRetrieveIssueForIdApi(params.issueId)
+            callRetrieveIssueForIdApi(params.issueId, authContext.token)
             .then((resp) => {
                 updateTitle(resp.data.issueTitle)
                 updateDesc(resp.data.issueDescription)
@@ -198,6 +202,8 @@ export default function ViewIssueComponent(){
                 updateDueDate(resp.data.dueDate)
                 updateCreatorName(resp.data.creatorName)
                 updateCreationDate(resp.data.creationDate)
+                updateCanEditIssue((authContext.loggedInUserName===resp.data.assigneeName)||
+                    (authContext.loggedInUserName===resp.data.creatorName))
             })
             .catch((error) => console.log(error))
 
@@ -227,7 +233,7 @@ export default function ViewIssueComponent(){
                                     </Typography> 
                                 </Grid>
                                 <Grid item xs={2}>
-                                   {viewModeEnabled && 
+                                   {(viewModeEnabled && canEditIssue) && 
                                     <Button 
                                         variant="contained"
                                         fullWidth={true}
@@ -237,13 +243,14 @@ export default function ViewIssueComponent(){
                                     </Button>}
                                 </Grid>
                                 <Grid item xs={2}>
+                                    {canEditIssue && 
                                     <Button 
                                         variant="contained"
                                         fullWidth={true}
                                         onClick={deleteIssue}
                                     >
                                         Delete
-                                    </Button>
+                                    </Button>}
                                 </Grid>
                             </Grid>
                         </Grid>
@@ -416,6 +423,7 @@ export default function ViewIssueComponent(){
                                         variant="contained"
                                         fullWidth={true}
                                         onClick={validateIssueContent}
+                                        disabled={(!canEditIssue)||(viewModeEnabled)}
                                     >
                                         Save
                                     </Button>

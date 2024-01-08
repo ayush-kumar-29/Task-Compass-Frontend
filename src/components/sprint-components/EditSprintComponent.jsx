@@ -1,8 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Button, CardContent, Grid, TextField, Typography } from '@mui/material';
 import Card from '@mui/material/Card';
 import { useNavigate, useParams } from 'react-router-dom';
 import { callRetrieveSprintForIdApi, callUpdateSprintContentApi, callValidateSprintNameApi } from '../../api/SprintApiService';
+import { AuthContext } from '../../auth/AuthContext';
 // import { makeStyles } from '@mui/styles';
 
 const cardStyle = ()=>({
@@ -20,6 +21,7 @@ const cardPosition = {
 export default function EditSprintComponent(){
     const params = useParams()
     const navigate = useNavigate()
+    const authContext = useContext(AuthContext)
 
     const [sprint, updateSprint] = useState()
     const [sprintError, setSprintError] = useState(false)
@@ -33,7 +35,7 @@ export default function EditSprintComponent(){
     const [endDateError, setEndDateError] = useState(false)
     const [endDateHelperText, setEndDateHelperText] = useState()
 
-    const [sprintNameExists, updateSprintNameExists] = useState(false)
+    const [sprintStatus, updateSprintStatus] = useState(false)
     const [initialValuesFetched, setInitialValuesFetched] = useState(false)
 
     function onSprintNameChanged(event){
@@ -63,11 +65,11 @@ export default function EditSprintComponent(){
             setSprintError(true)
             setSprintHelperText("Sprint name cannot be empty.")
         }
-        else if(sprintNameExists){
-            makeApiCall=false
-            setSprintError(true)
-            setSprintHelperText("Sprint name already exists.")
-        }
+        // else if(sprintNameExists){
+        //     makeApiCall=false
+        //     setSprintError(true)
+        //     setSprintHelperText("Sprint name already exists.")
+        // }
 
         setStartDateError(false)
         setStartDateHelperText(null)
@@ -85,17 +87,34 @@ export default function EditSprintComponent(){
             setEndDateHelperText("End date cannot be empty.")
         }
 
-        if(makeApiCall)
-            editSprintContent()
+        if(makeApiCall){
+            callValidateSprintNameApi(sprint, authContext.token)
+            .then((resp) => {
+                if(resp.data){
+                    setSprintError(true)
+                    setSprintHelperText("Sprint name already exists.")
+                }
+                else
+                editSprintContent()
+            })
+            .catch((error) => console.log(error))
+        }
     }
 
     function editSprintContent(){
         callUpdateSprintContentApi(
+            params.sprintId,
             {
                 sprintName: sprint,
                 sprintStartDate: startDate,
                 sprintEndDate: endDate, 
-            }
+                status: sprintStatus
+            },
+            {
+                updateType: "content",
+                newStatus: sprintStatus
+            },
+            authContext.token
         )
         .then((resp) => {
             navigate("/sprints")
@@ -104,27 +123,19 @@ export default function EditSprintComponent(){
     }
 
     useEffect(() =>{
-        if(initialValuesFetched){
-            callRetrieveSprintForIdApi(params.workItemId)
+        if(!initialValuesFetched){
+            callRetrieveSprintForIdApi(params.sprintId, authContext.token)
             .then((resp) => {
                 console.log(resp)
-                updateSprint(resp.data.sprint)
+                updateSprint(resp.data.sprintName)
                 updateStartDate(resp.data.sprintStartDate)
                 updateEndDate(resp.data.sprintEndDate)
+                updateSprintStatus(resp.data.status)
             })
             .catch((error) => console.log(error))
             setInitialValuesFetched(true)
         }
-
-        callValidateSprintNameApi(sprint)
-        .then((resp) => {
-            if(resp.data)
-                updateSprintNameExists(true)
-            else
-                updateSprintNameExists(false)
-        })
-        .catch((error) => console.log(error))
-    }, [sprint, initialValuesFetched])
+    }, [initialValuesFetched])
 
     return(
         <div style={cardPosition}>
@@ -137,7 +148,7 @@ export default function EditSprintComponent(){
                         >
                             <Grid item xs={12}>
                                 <Typography align="center" variant="h5">
-                                    Create Sprint
+                                    Edit Sprint
                                 </Typography>
                             </Grid>
 
@@ -148,6 +159,7 @@ export default function EditSprintComponent(){
                                     helperText={sprintHelperText}
                                     value={sprint}
                                     onChange={onSprintNameChanged}
+                                    InputLabelProps={{ shrink: true}}
                                 />  
                             </Grid>
 

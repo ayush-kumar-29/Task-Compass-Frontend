@@ -8,8 +8,9 @@ export function callLoginUserApi(username, password){
     return apiClient.post("/authenticate", requestPayload)
 }
 
-export function callLogoutUserApi(){
-    return apiClient.post("/logout")
+export function callLogoutUserApi(authToken){
+    const headers = {'Authorization': authToken}
+    return apiClient.post("/logout", {}, {headers})
 }
 
 export function callRegisterUserApi(username, password, emailId){
