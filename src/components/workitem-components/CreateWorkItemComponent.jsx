@@ -182,7 +182,7 @@ export default function CreateWorkItemComponent(){
                             >
                                 <Grid item xs={12}>
                                     <Typography variant="h5">
-                                        Create Task
+                                        Create Work Item
                                     </Typography> 
                                 </Grid>
                             </Grid>

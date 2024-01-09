@@ -265,7 +265,7 @@ export default function ViewWorkItemComponent(){
                                 <Grid item xs={4}></Grid>
                                 <Grid item xs={4}>
                                     <Typography variant="h5">
-                                        Task Id
+                                        Work Item Id
                                     </Typography> 
                                 </Grid>
                                 <Grid item xs={2}>
